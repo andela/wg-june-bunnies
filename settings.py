@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import os
 from wger.settings_global import *
 
 # Use 'DEBUG = True' to get more details for server errors
@@ -16,11 +16,11 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.environ.get("DB_NAME"),
-        'USER':     os.environ.get("DB_USER"),
-        'HOST':     os.environ.get("DB_HOST"),
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
         'PASSWORD': os.environ.get("DB_PASS"),
-        'PORT': os.environ.get("DB_PORT"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT")
     }
 }
 
