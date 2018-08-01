@@ -126,6 +126,9 @@ MIDDLEWARE_CLASSES = (
     # Django mobile
     'django_mobile.middleware.MobileDetectionMiddleware',
     'django_mobile.middleware.SetFlavourMiddleware',
+
+    # Whitenoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
