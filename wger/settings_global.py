@@ -138,6 +138,8 @@ MIDDLEWARE_CLASSES = (
 
     # Whitenoise middleware
     'whitenoise.middleware.WhiteNoiseMiddleware'
+    # django social auth
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
