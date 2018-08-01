@@ -135,6 +135,9 @@ MIDDLEWARE_CLASSES = (
     'django_mobile.middleware.SetFlavourMiddleware',
     # django social auth
     'social_django.middleware.SocialAuthExceptionMiddleware',
+
+    # Whitenoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
