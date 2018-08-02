@@ -49,4 +49,3 @@ sphinxcontrib-websupport==1.1.0
 sqlparse==0.2.4
 urllib3==1.23
 webencodings==0.5.1
--e git+git@github.com:andela/wg-june-bunnies.git@33e796bd4442b36c4bb5a315c81714f1c3ab4a29#egg=wger
