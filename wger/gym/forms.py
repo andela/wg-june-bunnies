@@ -33,6 +33,7 @@ class GymUserPermisssionForm(forms.ModelForm):
 
     # Empty default roles, they are always set at run time
     ROLES = ()
+    choices = (("deactivate","deactivate"), ("remove","remove"))
 
     class Meta:
         model = User
@@ -40,6 +41,8 @@ class GymUserPermisssionForm(forms.ModelForm):
 
     role = forms.MultipleChoiceField(choices=ROLES,
                                      initial=USER)
+    # For when we need to change the UI
+    # edit = forms.ChoiceField(choices=choices, initial="deactivate",widget=BootstrapSelectMultiple(), label="Manage Trainer")
 
     def __init__(self, available_roles=[], *args, **kwargs):
         '''
@@ -54,6 +57,7 @@ class GymUserPermisssionForm(forms.ModelForm):
             field_choices.append((self.GYM_ADMIN, _('Gym administrator')))
         if 'manager' in available_roles:
             field_choices.append((self.MANAGER, _('General manager')))
+  
 
         self.fields['role'] = forms.MultipleChoiceField(choices=field_choices,
                                                         initial=User,

@@ -10,7 +10,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('email', '0002_auto_20180731_1718'),
+        ('email', '0002_auto_20180730_1707'),
         ('email', '0002_auto_20180731_1244'),
     ]
 
