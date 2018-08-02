@@ -18,9 +18,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get("DB_NAME"),
         'USER': os.environ.get("DB_USER"),
-        'HOST': os.environ.get("DB_HOST"),
         'PASSWORD': os.environ.get("DB_PASS"),
-        'PORT': os.environ.get("DB_PORT"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT")
     }
 }
 if os.environ.get("TRIGGER") == "True":
