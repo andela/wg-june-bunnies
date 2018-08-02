@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 [run]
 omit =
     *migrations*
     *venv*
 
+=======
+[report]
+omit= 
+    *migrations*
+    *venv*
+>>>>>>> b01964cac24be58b22d3a14a9c05a03c5f23c717
