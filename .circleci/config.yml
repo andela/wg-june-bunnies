@@ -33,8 +33,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            python setup.py develop
-            invoke create-settings --settings-path ./settings.py --database-path ./database.sqlite
+            invoke create_settings --settings-path ./settings.py --database-path ./database.sqlite
       - save_cache:
           paths:
             - ./venv
