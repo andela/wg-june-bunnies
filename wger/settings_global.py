@@ -137,7 +137,7 @@ MIDDLEWARE_CLASSES = (
     'social_django.middleware.SocialAuthExceptionMiddleware',
 
     # Whitenoise middleware
-    'whitenoise.middleware.WhiteNoiseMiddleware'
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     # django social auth
     'social_django.middleware.SocialAuthExceptionMiddleware',
 )
