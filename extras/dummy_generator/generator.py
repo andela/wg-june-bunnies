@@ -31,14 +31,14 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 django.setup()
 
 # Must happen after calling django.setup()
-from django.contrib.auth.models import User
-from wger.core.models import DaysOfWeek
-from wger.exercises.models import Exercise
-from wger.gym.models import (
+from django.contrib.auth.models import User  # noqa
+from wger.core.models import DaysOfWeek  # noqa
+from wger.exercises.models import Exercise  # noqa
+from wger.gym.models import (  # noqa
     GymUserConfig,
     Gym
 )
-from wger.manager.models import (
+from wger.manager.models import (  # noqa
     Workout,
     Day,
     Set,
@@ -48,15 +48,13 @@ from wger.manager.models import (
     WorkoutLog,
     WorkoutSession
 )
-from wger.weight.models import WeightEntry
+from wger.weight.models import WeightEntry  # noqa
 
-from wger.core.models import Language
+from wger.core.models import Language  # noqa
 
 # Nutrition import //_c
-from wger.nutrition.models import (
+from wger.nutrition.models import (  # noqa
     Ingredient,
-    IngredientWeightUnit,
-    WeightUnit,
     NutritionPlan,
     Meal,
     MealItem
@@ -130,13 +128,15 @@ weight_parser.add_argument('--base-weight',
 
 # Nutrition options
 nutrition_parser = subparsers.add_parser('nutrition', help='Creates a meal plan')
-nutrition_parser.add_argument('number_nutrition_plans',
-                         action='store',
-                         help='Number of meal plans to create',
-                         type=int)
-nutrition_parser.add_argument('--add-to-user',
-                           action='store',
-                           help='Add to the specified user-ID, not all existing users')
+nutrition_parser.add_argument(
+    'number_nutrition_plans',
+    action='store',
+    help='Number of meal plans to create',
+    type=int)
+nutrition_parser.add_argument(
+    '--add-to-user',
+    action='store',
+    help='Add to the specified user-ID, not all existing users')
 
 args = parser.parse_args()
 # print(args)
@@ -452,7 +452,6 @@ if hasattr(args, 'number_nutrition_plans'):
 
     # Total meals per plan
     total_meals = 4
-    
     for user in userlist:
         print('   - generating for {0}'.format(user.username))
 
@@ -460,8 +459,10 @@ if hasattr(args, 'number_nutrition_plans'):
         for i in range(0, args.number_nutrition_plans):
             uid = str(uuid.uuid4()).split('-')
             start_date = datetime.date.today() - datetime.timedelta(days=random.randint(0, 100))
-            nutrition_plan = NutritionPlan(language=Language.objects.all()[1], description='Dummy nutrition plan - {0}'.format(uid[1]),
-                              creation_date=start_date)
+            nutrition_plan = NutritionPlan(
+                language=Language.objects.all()[1],
+                description='Dummy nutrition plan - {0}'.format(uid[1]),
+                creation_date=start_date)
             nutrition_plan.user = user
 
             nutrition_plan.save()
@@ -471,8 +472,13 @@ if hasattr(args, 'number_nutrition_plans'):
             for j in range(0, total_meals):
                 meal = Meal(plan=nutrition_plan, order=order)
                 meal.save()
-                for k in range(0, random.randint(1,5)):
+                for k in range(0, random.randint(1, 5)):
                     ingredient = random.choice(ingredientList)
-                    meal_item = MealItem(meal=meal, ingredient=ingredient, weight_unit=None, order=order, amount=random.randint(10, 250))
+                    meal_item = MealItem(
+                        meal=meal,
+                        ingredient=ingredient,
+                        weight_unit=None,
+                        order=order,
+                        amount=random.randint(10, 250))
                     meal_item.save()
                 order = order + 1

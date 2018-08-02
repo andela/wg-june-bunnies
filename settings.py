@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 from wger.settings_global import *  # noqa
 import dj_database_url
@@ -17,9 +16,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.environ.get("DB_NAME"),
-        'USER':     os.environ.get("DB_USER"),
-        'HOST':     os.environ.get("DB_HOST"),
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'HOST': os.environ.get("DB_HOST"),
         'PASSWORD': os.environ.get("DB_PASS"),
         'PORT': os.environ.get("DB_PORT"),
     }
