@@ -29,7 +29,7 @@ if os.environ.get("TRIGGER") == "True":
 
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'a81m9y_2rk^h+vaktdzk7)iqitj(r0!)1hh!gly-8*fk85d1fh'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Your reCaptcha keys
 RECAPTCHA_PUBLIC_KEY = ''
@@ -39,11 +39,11 @@ NOCAPTCHA = True
 # The site's URL (e.g. http://www.my-local-gym.com or http://localhost:8000)
 # This is needed for uploaded files and images (exercise images, etc.) to be
 # properly served.
-SITE_URL = 'http://localhost:8000'
+SITE_URL = os.environ.get("SITE_URL")
 
 # Path to uploaded files
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = '/Users/loicemeyo/.local/share/wger/media'
+MEDIA_ROOT = '/wger/media'
 MEDIA_URL = '/media/'
 
 # Allow all hosts to access the application. Change if used in production.
