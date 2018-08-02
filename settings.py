@@ -20,7 +20,7 @@ DATABASES = {
         'USER': os.environ.get("DB_USER"),
         'HOST': os.environ.get("DB_HOST"),
         'PASSWORD': os.environ.get("DB_PASS"),
-        'PORT': os.environ.get("DB_PORT"),
+        'PORT': os.environ.get("DB_PORT")
     }
 }
 if os.environ.get("TRIGGER") == "True":
