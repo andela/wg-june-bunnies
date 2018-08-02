@@ -609,7 +609,7 @@ class MealItem(models.Model):
                                  validators=[MinValueValidator(1),
                                              MaxValueValidator(1000)])
 
-    meal_choice = models.CharField(max_length=15, default='Eaten', 
+    status_choice = models.CharField(max_length=15, default='Eaten', 
                                     verbose_name=_('Meal Status'))
 
     def __str__(self):
