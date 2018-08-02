@@ -37,6 +37,8 @@ NOCAPTCHA = True
 # This is needed for uploaded files and images (exercise images, etc.) to be
 # properly served.
 SITE_URL = os.environ.get("SITE_URL")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static-collected')
 
 # Path to uploaded files
 # Absolute filesystem path to the directory that will hold user-uploaded files.
