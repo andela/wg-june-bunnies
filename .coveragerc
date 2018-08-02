@@ -1,2 +1,4 @@
-[run]
-omit = *migrations*
+[report]
+omit= 
+    *migrations*
+    *venv*
