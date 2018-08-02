@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from wger.settings_global import *  # noqa
+import dj_database_url
 
 # Use 'DEBUG = True' to get more details for server errors
 DEBUG = True
@@ -24,6 +25,8 @@ DATABASES = {
 
     }
 }
+if os.environ.get("TRIGGER") == "True":
+    DATABASES["default"] = dj_database_url.config()
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -37,8 +40,6 @@ NOCAPTCHA = True
 # This is needed for uploaded files and images (exercise images, etc.) to be
 # properly served.
 SITE_URL = os.environ.get("SITE_URL")
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static-collected')
 
 # Path to uploaded files
 # Absolute filesystem path to the directory that will hold user-uploaded files.
