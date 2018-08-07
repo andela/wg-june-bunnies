@@ -27,7 +27,7 @@
 body {
   overflow-x: hidden;
   /*font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;*/
-  font-family: font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
+  font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
 }
 .text-muted {
   color: #777777;
@@ -79,7 +79,7 @@ h6 {
   background-color: #eeeeee;
 }
 .bg-darkest-gray {
-  background-color: #222222;
+  background-color: #204a87;
 }
 .btn-primary {
   color: white;
@@ -136,15 +136,18 @@ fieldset[disabled] .btn-primary.active {
   border-radius: 3px;
   font-size: 18px;
   padding: 20px 40px;
+  border-right: 50px;
+  border-left: 50px;
 }
 .btn-xl:hover,
 .btn-xl:focus,
 .btn-xl:active,
 .btn-xl.active,
 .open .dropdown-toggle.btn-xl {
-  color: white;
-  background-color: #1a3c6e;
+  color: #204a87;
+  background-color: white;
   border-color: #1a3c6e;
+  
 }
 .btn-xl:active,
 .btn-xl.active,
@@ -276,16 +279,16 @@ header .intro-text .intro-lead-in {
   margin-bottom: 25px;
 }
 header .intro-text .intro-heading {
-  font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
+  font-family: 'Courier New', Courier, monospace;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 50px;
   line-height: 50px;
   margin-bottom: 25px;
 }
 @media (min-width: 768px) {
   header .intro-text {
-    padding-top: 300px;
+    padding-top: 100px;
     padding-bottom: 200px;
   }
   header .intro-text .intro-lead-in {
@@ -314,7 +317,7 @@ section h2.section-heading {
 }
 section h3.section-subheading {
   font-size: 16px;
-  font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
+  font-family: "Open Sans Light", Arial, Helvetica, sans-serif; 
   text-transform: none;
   font-style: italic;
   font-weight: 400;

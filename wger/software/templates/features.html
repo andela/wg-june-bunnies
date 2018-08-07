@@ -22,11 +22,9 @@
         <div class="container">
             <div class="intro-text">
                 <div class="intro-heading">{% trans "Welcome to wger" %}</div>
-                <div class="intro-lead-in">{% trans "Your body." %}</div>
-                <div class="intro-lead-in">{% trans "Your workouts." %}</div>
-                <div class="intro-lead-in">{% trans "Your data." %}</div>
-                <div class="intro-lead-in">{% trans "Your progress." %}</div>
+                <div class="intro-lead-in">{% trans "Your body. Your workouts. Your data. Your progress." %}</div>
                 {% if allow_guest_users and not user.is_authenticated %}
+
                     <a href="{% url 'core:user:demo-entries' %}" class="page-scroll btn btn-xl" rel="nofollow" style="margin-top: 1em;">
                         {% trans "Try it now" %}
                     </a>
@@ -53,7 +51,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <h2 class="section-heading text-light">{% trans "Your advantages" %}</h2>
-                    <h3 class="section-subheading text-muted">
+                    <h3 class="section-subheading text-light">
                         {% blocktrans trimmed %}
                             wger Workout Manager is a free, open source web application that manages
                             your exercises, workouts and nutrition. It started as a pet project of
@@ -70,7 +68,7 @@
                         <i class="fa fa-user fa-stack-1x fa-inverse"></i>
                     </span>
                     <h4 class="service-heading text-light">{% trans "Workouts" %}</h4>
-                    <p class="text-muted">
+                    <p class="text-light">
                         {% blocktrans trimmed %}
                             You can create and manage flexible workout routines for any goals you
                             have. Select exactly which exercises you'll do and how many repetitions,
@@ -85,7 +83,7 @@
                         <i class="fa fa-cutlery fa-stack-1x fa-inverse"></i>
                     </span>
                     <h4 class="service-heading text-light">{% trans "Nutrition" %}</h4>
-                    <p class="text-muted">
+                    <p class="text-light">
                         {% blocktrans trimmed %}
                             Create your personal diet plan by creating as many meals with as many
                             different ingredients as you need. The application will calculate the
@@ -100,7 +98,7 @@
                         <i class="fa fa-line-chart fa-stack-1x fa-inverse"></i>
                     </span>
                     <h4 class="service-heading text-light">{% trans 'Diary' %}</h4>
-                    <p class="text-muted">
+                    <p class="text-light">
                         {% blocktrans trimmed %}
                             Enter the weights and repetitions you did for each exercise to generate
                             diagrams that let you see at a glance how well you are doing. The raw
