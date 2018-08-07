@@ -3,6 +3,8 @@
  * Copyright 2013-2016 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
+
+ 
 @font-face {
     font-family:"Open Sans Light";
         src:url("/static/fonts/OpenSans-Light.eot?") format("eot"),
@@ -272,13 +274,14 @@ header .intro-text {
   padding-bottom: 50px;
 }
 header .intro-text .intro-lead-in {
+
   font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
   font-style: italic;
   font-size: 22px;
   line-height: 22px;
   margin-bottom: 25px;
 }
-header .intro-text .intro-heading {
+header .intro-text .bg-darkest-gray  {
   font-family: 'Courier New', Courier, monospace;
   text-transform: uppercase;
   font-weight: 400;
@@ -292,14 +295,15 @@ header .intro-text .intro-heading {
     padding-bottom: 200px;
   }
   header .intro-text .intro-lead-in {
-    font-family: "Open Sans Light", Arial, Helvetica, sans-serif;
+    /* font-family: "Open Sans Light", Arial, Helvetica, sans-serif; */
     font-style: italic;
     font-size: 40px;
     line-height: 40px;
     margin-bottom: 25px;
   }
   header .intro-text .intro-heading {
-    font-family: "Open Sans Bold", Arial, Helvetica, sans-serif;
+    font-family: 'Courier New', Courier, monospace;
+    /* font-family: "Open Sans Bold", Arial, Helvetica, sans-serif; */
     text-transform: uppercase;
     font-weight: 700;
     font-size: 75px;
@@ -325,7 +329,7 @@ section h3.section-subheading {
 }
 @media (min-width: 768px) {
   section {
-    padding: 150px 0;
+    padding: 100px 0;
   }
 }
 .service-heading {
