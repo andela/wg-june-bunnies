@@ -325,7 +325,7 @@ section h3.section-subheading {
   text-transform: none;
   font-style: italic;
   font-weight: 400;
-  margin-bottom: 75px;
+  margin-bottom: 50px;
 }
 @media (min-width: 768px) {
   section {
@@ -502,7 +502,7 @@ section h3.section-subheading {
     left: 50%;
   }
   .timeline > li {
-    margin-bottom: 100px;
+    margin-bottom: 50px;
     min-height: 100px;
   }
   .timeline > li .timeline-panel {
@@ -530,6 +530,7 @@ section h3.section-subheading {
 }
 @media (min-width: 992px) {
   .timeline > li {
+    margin-bottom: 50px;
     min-height: 150px;
   }
   .timeline > li .timeline-panel {
@@ -551,6 +552,7 @@ section h3.section-subheading {
 }
 @media (min-width: 1200px) {
   .timeline > li {
+    margin-bottom: 50px;
     min-height: 170px;
   }
   .timeline > li .timeline-panel {
