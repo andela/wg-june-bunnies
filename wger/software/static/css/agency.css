@@ -302,7 +302,7 @@ header .intro-text .bg-darkest-gray  {
     margin-bottom: 25px;
   }
   header .intro-text .intro-heading {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
     /* font-family: "Open Sans Bold", Arial, Helvetica, sans-serif; */
     text-transform: uppercase;
     font-weight: 700;
