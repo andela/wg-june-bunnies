@@ -1,7 +1,6 @@
 {% load i18n staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'bower_components/datatables/media/css/dataTables.bootstrap.min.css' %}">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <script src="{% static 'bower_components/datatables/media/js/jquery.dataTables.min.js' %}" ></script>
 <script src="{% static 'bower_components/datatables/media/js/dataTables.bootstrap.min.js' %}" ></script>
 <script>
@@ -23,22 +22,22 @@ $(document).ready( function () {
       }
       tablinks = document.getElementsByClassName("tablink");
       for (i = 0; i < x.length; i++) {
-         tablinks[i].className = tablinks[i].className.replace(" w3-border-red", "");
+         tablinks[i].className = tablinks[i].className.replace(" w3-border-green", "");
+         tablinks[i].className = tablinks[i].className.replace(" w3-bottombar", "");
       }
       document.getElementById(tabName).style.display = "block";
-      evt.currentTarget.firstElementChild.className += " w3-border-red";
+      evt.currentTarget.firstElementChild.className += " w3-border-green ";
+      evt.currentTarget.firstElementChild.className += " w3-bottombar ";
     }
 </script>
 
 <div class="w3-container">
-  <h2>Members List</h2>
-
   <div class="w3-row">
     <a href="javascript:void(0)" class="active" onclick="openTab(event, 'Active');">
-      <div class="w3-third tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-red">Active Users</div>
+      <div class="w3-third tablink  w3-hover-light-grey w3-padding w3-bottombar w3-border-green"><h4>Active Members List</h4></div>
     </a>
     <a href="javascript:void(0)" onclick="openTab(event, 'Inactive');">
-      <div class="w3-third tablink w3-bottombar w3-hover-light-grey w3-padding">Inactive Users</div>
+      <div class="w3-third tablink w3-hover-light-grey w3-padding"><h4>Inactive Members List</h4></div>
     </a>
   </div>
 
