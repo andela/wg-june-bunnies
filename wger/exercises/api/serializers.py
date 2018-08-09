@@ -25,6 +25,17 @@ from wger.exercises.models import (
 )
 
 
+class ExerciseInformationSerializer(serializers.ModelSerializer):
+    '''
+    Give detailed information about an exercise
+    '''
+    class Meta:
+        depth = 3
+        model = Exercise
+        fields = ('id', 'name', 'uuid','category', 'description', 'muscles',
+                  'muscles_secondary', 'equipment', 'language')
+
+
 class ExerciseSerializer(serializers.ModelSerializer):
     '''
     Exercise serializer
