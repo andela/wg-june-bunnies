@@ -21,9 +21,11 @@ import csv
 import json, os
 from io import TextIOWrapper
 from json import loads, dumps
+from django.core import serializers
+from django.contrib import messages
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, JsonResponse
 from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy, ugettext as _
@@ -410,60 +412,55 @@ def timer(request, day_pk):
 @login_required
 def export_workout(request):
     workouts = Workout.objects.filter(user=request.user)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=workout.csv'
-    writer = csv.writer(response)
-    writer.writerow(['Creation Date',
-                     'Comment',
-                     'Days',
-                     'Description',
-                     'Exercise'])
+    json_data={}
     for workout in workouts:
+        workout_data={}
+        workout_data['creation_date'] = str(workout.creation_date)
+        workout_data['comment'] = workout.comment
         days = Day.objects.filter(training=workout.id)
         for day in days:
-            workout_days = "/".join(
-                [record.day_of_week for record in day.day.all()]
-            )
+            workout_days = [record.day_of_week for record in day.day.all()]
+            workout_data['description']=day.description
+            workout_data['workout_days']=workout_days
             sets = Set.objects.filter(exerciseday=day.id)
             for each_set in sets:
-                exercises = "/".join(
-                    [exercise.name for exercise in each_set.exercises.all()]
-                )
-                writer.writerow([
-                    workout.creation_date,
-                    workout.comment, workout_days,
-                    day.description, exercises
-                ])
-    return response
+                exercises = [exercise.name for exercise in each_set.exercises.all()]
+                workout_data['exercises']= exercises
+        json_data[str(workout.pk)]=workout_data
 
+    data = JsonResponse(json_data)
+    response = HttpResponse(data, content_type='application/force-download')
+    response['Content-Disposition'] = 'attachment; filename="workouts.json"'
+    return response
 
 @login_required
 def import_workout(request):
     if request.POST and request.FILES:
-        csvfile = TextIOWrapper(
-            request.FILES['csv_file'].file,
-            encoding="utf-8"
-        )
-        reader = csv.DictReader(csvfile)
-        workouts = []
-        for row in reader:
-            workouts.append(dict(row))
-        for each_workout in workouts:
-            workout = Workout(
-                creation_date=each_workout["Creation Date"],
-                comment=each_workout["Comment"],
+        json_file = request.FILES['csv_file'].file
+        data = json_file.read()
+        workouts =json.loads(data.decode('utf8').replace("'", '"'))
+        for workout in workouts:
+            # create workouts 
+            new_workout = Workout(
+                creation_date= workouts[workout]['creation_date'],
+                comment=workouts[workout]["comment"],
                 user=request.user)
-            workout.save()
-            day = Day(training=workout, description=each_workout["Description"])
-            day.save()
-            for day_name in each_workout["Days"].split("/"):
-                day.day.add(
-                    DaysOfWeek.objects.filter(day_of_week=day_name).first()
-                )
-            one_set = Set(exerciseday=day)
-            one_set.save()
-            for exercise in each_workout["Exercise"].split("/"):
-                one_set.exercises.add(
-                    Exercise.objects.filter(name=exercise).first()
-                )
+            new_workout.save()
+            if 'workout_days' in workouts[workout]:
+                day = Day(training=new_workout, description=workouts[workout]["description"])
+                day.save()
+                for day_name in workouts[workout]["workout_days"]:
+                    day.day.add(
+                        DaysOfWeek.objects.filter(day_of_week=day_name).first()
+                    )
+                if 'exercises' in workouts[workout]:
+                    one_set = Set(exerciseday=day)
+                    one_set.save()
+                    for exercise in workouts[workout]["exercises"]:
+                        one_set.exercises.add(
+                            Exercise.objects.filter(name=exercise).first()
+                        )
+    messages.success(request, _(
+                          'workout(s) import was successful'))
+
     return HttpResponseRedirect(reverse('manager:workout:overview'))

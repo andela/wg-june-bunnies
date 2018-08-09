@@ -28,16 +28,38 @@
     </div>
 {% endblock %}
 
-
 {% block options %}
 <div class="container-fluid">
     <a href="{% url 'manager:workout:add' %}" class="btn btn-success btn-sm">
         {% trans "Add workout" %}
     </a>
-    <form action="{% url 'manager:workout:import_workout' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
-        <h5>{% trans "Import workout (.cvs file)" %}:</h5>
-         <p><input type="file" name="csv_file"   accept=".csv"/></p>
-         <input type="submit" value="Import" class="btn btn-success btn-sm" />
-    </form>
+    <a href="{% url 'manager:workout:export_workout'%}" class="btn btn-success btn-sm">
+        {% trans "Export workouts" %}
+    </a>
+    <a href="#" data-toggle="modal" data-target="#importModal" class="btn btn-success btn-sm">
+            {% trans "Import workouts" %}
+    </a>
+    <div id="importModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Import workouts (json)</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'manager:workout:import_workout' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <div class="col-sm-8">
+                                <input type="file" class="form-control-file" name="csv_file" accept=".json"/>
+                            </div>
+                        </div>
+                        <input type="submit" value="Import" class="btn btn-success btn-sm" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
 {% endblock %}
