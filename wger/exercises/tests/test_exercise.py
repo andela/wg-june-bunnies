@@ -264,6 +264,17 @@ class ExercisesTestCase(WorkoutManagerTestCase):
         self.add_exercise_user_fail()
         self.user_logout()
 
+    def filter_exercise_by_language(self, admin=False):
+        '''
+        Tests adding/editing an exercise with a user with enough rights to do this
+        '''
+
+        # Add an exercise
+        count_before = Exercise.objects.count()
+        description = 'a nice, long and accurate description for the exercise'
+        response = self.client.post(reverse('exercise:exercise:overview'),param_data=("lang","en"))
+        self.assertEqual(response.status_code, 200)
+
     def add_exercise_success(self, admin=False):
         '''
         Tests adding/editing an exercise with a user with enough rights to do this
