@@ -10,34 +10,6 @@
 -->
 {% block title %}{% trans "Exercises" %}
 
-<!-- <div class="btn-group" style="float: right;">
-    <button type="button" class="btn btn-success dropdown-toggle btn-sm" data-toggle="dropdown">
-        {% trans 'Filter by language' %}
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-        {% for language in languages %}
-        {% language_select language %}
-        {% endfor %}
-        <li class="divider"></li>
-        <li>
-            <a href="https://www.transifex.com/rge/wger-workout-manager/">
-                <span class="{% fa_class 'plus' %}"></span>
-                {% trans "Translate" %}
-            </a>
-        </li>
-    </ul>
-</div>
-<div class="btn-group">
-    <button type="button" class="btn btn-primary btn-sm" disabled>
-        {% if lang %}
-        {{lang.full_name}}
-        {% else %}
-        All Languages
-        {% endif %}
-    </button>
-</div> -->
-
 <div class="btn-group" style="float: right;">
     <button type="button" class="btn btn-success dropdown-toggle btn-sm" data-toggle="dropdown">
         {% trans 'Filter by language' %}

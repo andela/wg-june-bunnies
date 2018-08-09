@@ -78,71 +78,24 @@ class ExerciseListView(ListView):
         '''
         Filter to only active exercises in the configured languages
         '''
-    #     language = None
-    #     language_code = self.request.GET.get('lang', None)
-         
-    #     if language_code:
-    #         lang = Language.objects.filter(short_name=language_code)
-    #         if lang.exists():
-    #             language = lang.first().id
-
-    #     if language:
-    #         return Exercise.objects.accepted().filter(language=language).order_by('category__id').select_related()
-    #     return Exercise.objects.accepted() \
-    #         .order_by('category__id') \
-    #         .select_related()
-        
-    # def get_context_data(self, **kwargs):
-    #     '''
-    #      Pass additional data to the template
-    #      '''
-    #     context = super(ExerciseListView, self).get_context_data(**kwargs)
-    #     context['show_shariff'] = True
-    #     context['lang'] = self.get_filter_language()
-    #     return context
-
-    # def get_filter_language(self):
-    #     language_code = self.request.GET.get('lang', None)
-    #     lang = None
-    #     if language_code:
-    #         lang = Language.objects.get(short_name=language_code)
-    #     return lang
-        # language = None
-        # language_code = self.request.GET.get('lang', None)
-        # languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES)
-         
-        # if language_code:
-        #     lang = Language.objects.filter(short_name=language_code)
-        #     if lang.exists():
-        #         language = lang.first().id
-
-        # if language:
-        #     return Exercise.objects.accepted() \
-        #         .filter(language=language) \
-        #         .order_by('category__id') \
-        #         .select_related()
-
-        # return Exercise.objects.accepted() \
-        #     .filter(language__in=languages) \
-        #     .order_by('category__id') \
-        #     .select_related()
-        
+        #Get the language from the URL
         language_code = self.request.GET.get('lang', None)
         if language_code:
             cache.clear()
-            print("hhehehehe--"+language_code+"------")
             lang = Language.objects.filter(short_name=language_code).first()
+            #Check if the language exists in our server trans service
             if lang:
-                print("existss--"+str(lang.id)+"----")
                 language = lang.id
                 return Exercise.objects.accepted() \
                     .filter(language_id=language) \
                     .order_by('category__id') \
                     .select_related()
             else:
+                #Handle the error
                 print("Language Doesn't exist----")
             
         else:
+            #Load all languages if none is specified
             languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES)
         return Exercise.objects.accepted() \
             .filter(language__in=languages) \
@@ -163,7 +116,6 @@ class ExerciseListView(ListView):
         lang = None
         if language_code:
             lang = Language.objects.get(short_name=language_code)
-            print("LanguageCode Gotttttttttt")
         return lang
 
 
