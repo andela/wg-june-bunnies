@@ -78,12 +78,12 @@ class ExerciseListView(ListView):
         '''
         Filter to only active exercises in the configured languages
         '''
-        #Get the language from the URL
+        # Get the language from the URL
         language_code = self.request.GET.get('lang', None)
         if language_code:
             cache.clear()
             lang = Language.objects.filter(short_name=language_code).first()
-            #Check if the language exists in our server trans service
+            # Check if the language exists in our server trans service
             if lang:
                 language = lang.id
                 return Exercise.objects.accepted() \
@@ -91,11 +91,11 @@ class ExerciseListView(ListView):
                     .order_by('category__id') \
                     .select_related()
             else:
-                #Handle the error
+                # Handle the error
                 print("Language Doesn't exist----")
             
         else:
-            #Load all languages if none is specified
+            # Load all languages if none is specified
             languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES)
         return Exercise.objects.accepted() \
             .filter(language__in=languages) \
