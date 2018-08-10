@@ -209,25 +209,27 @@ class WorkoutExportTestCase(WorkoutManagerTestCase):
 
     def get_workout_overview(self):
         '''
-        Helper function to test the workout overview
+        Helper function to test the workout export
         '''
 
         response = self.client.get(reverse('manager:workout:export_workout'))
 
         # Page exists
         self.assertEqual(response.status_code, 200)
+        self.assertEquals(response.get('Content-Disposition'),
+                            "attachment; filename=workouts.json")
 
 class WorkoutImportTestCase(WorkoutManagerTestCase):
     '''
-    Tests the workout export
+    Tests the workout import
     '''
 
     def get_workout_overview(self):
         '''
-        Helper function to test the workout overview
+        Helper function to test the workout import
         '''
 
-        response = self.client.get(reverse('manager:workout:import_workout'))
+        response = self.client.post(reverse('manager:workout:import_workout'))
 
         # Page exists
         self.assertEqual(response.status_code, 200)
