@@ -272,7 +272,7 @@ class ExercisesTestCase(WorkoutManagerTestCase):
         # Add an exercise
         count_before = Exercise.objects.count()
         description = 'a nice, long and accurate description for the exercise'
-        response = self.client.post(reverse('exercise:exercise:overview'),param_data=("lang","en"))
+        response = self.client.post(reverse('exercise:exercise:overview',lang="en"))
         self.assertEqual(response.status_code, 200)
 
     def add_exercise_success(self, admin=False):
