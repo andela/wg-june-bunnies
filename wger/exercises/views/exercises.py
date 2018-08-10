@@ -17,6 +17,7 @@ import six
 import logging
 import uuid
 from django.core import mail
+from django.core.cache import cache
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
@@ -39,7 +40,7 @@ from django.views.generic import (
     CreateView,
     UpdateView
 )
-
+from wger.core.models import Language
 from wger.manager.models import WorkoutLog
 from wger.exercises.models import (
     Exercise,
@@ -77,7 +78,25 @@ class ExerciseListView(ListView):
         '''
         Filter to only active exercises in the configured languages
         '''
-        languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES)
+        # Get the language from the URL
+        language_code = self.request.GET.get('lang', None)
+        if language_code:
+            cache.clear()
+            lang = Language.objects.filter(short_name=language_code).first()
+            # Check if the language exists in our server trans service
+            if lang:
+                language = lang.id
+                return Exercise.objects.accepted() \
+                    .filter(language_id=language) \
+                    .order_by('category__id') \
+                    .select_related()
+            else:
+                # Handle the error
+                print("Language Doesn't exist----")
+            
+        else:
+            # Load all languages if none is specified
+            languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES)
         return Exercise.objects.accepted() \
             .filter(language__in=languages) \
             .order_by('category__id') \
@@ -89,7 +108,15 @@ class ExerciseListView(ListView):
         '''
         context = super(ExerciseListView, self).get_context_data(**kwargs)
         context['show_shariff'] = True
+        context['lang'] = self.get_filter_language()
         return context
+
+    def get_filter_language(self):
+        language_code = self.request.GET.get('lang', None)
+        lang = None
+        if language_code:
+            lang = Language.objects.get(short_name=language_code)
+        return lang
 
 
 def view(request, id, slug=None):
