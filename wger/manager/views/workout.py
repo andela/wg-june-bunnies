@@ -413,11 +413,14 @@ def timer(request, day_pk):
 def export_workout(request):
     workouts = Workout.objects.filter(user=request.user)
     json_data={}
+    #  go through workouts and store each workout in workout_data dictionary
     for workout in workouts:
         workout_data={}
         workout_data['creation_date'] = str(workout.creation_date)
         workout_data['comment'] = workout.comment
         days = Day.objects.filter(training=workout.id)
+        # go through each workout data and add it and all all exercises for that day in workout_data 
+        # dictionary
         for day in days:
             workout_days = [record.day_of_week for record in day.day.all()]
             workout_data['description']=day.description
@@ -427,7 +430,7 @@ def export_workout(request):
                 exercises = [exercise.name for exercise in each_set.exercises.all()]
                 workout_data['exercises']= exercises
         json_data[str(workout.pk)]=workout_data
-
+    # Generate json responce data and force file download 
     data = JsonResponse(json_data)
     response = HttpResponse(data, content_type='application/force-download')
     response['Content-Disposition'] = 'attachment; filename="workouts.json"'
@@ -446,6 +449,7 @@ def import_workout(request):
                 comment=workouts[workout]["comment"],
                 user=request.user)
             new_workout.save()
+            # if workout has workout days then create days
             if 'workout_days' in workouts[workout]:
                 day = Day(training=new_workout, description=workouts[workout]["description"])
                 day.save()
@@ -453,6 +457,7 @@ def import_workout(request):
                     day.day.add(
                         DaysOfWeek.objects.filter(day_of_week=day_name).first()
                     )
+                # if workout days has exercises then create them
                 if 'exercises' in workouts[workout]:
                     one_set = Set(exerciseday=day)
                     one_set.save()

@@ -51,7 +51,7 @@
                         {% csrf_token %}
                         <div class="form-group row">
                             <div class="col-sm-8">
-                                <input type="file" class="form-control-file" name="csv_file" accept=".json"/>
+                                <input type="file" required class="form-control-file" name="csv_file" accept=".json"/>
                             </div>
                         </div>
                         <input type="submit" value="Import" class="btn btn-success btn-sm" />
