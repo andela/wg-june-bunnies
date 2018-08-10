@@ -2,5 +2,4 @@
 omit= 
     *migrations*
     *venv*
-    settings.py
     *tests*
