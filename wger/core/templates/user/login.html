@@ -13,13 +13,13 @@
       class="form-horizontal">
     {% trans 'Login' as submit_text %}
     {% render_form_fields form submit_text %}
-    <div class="">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-        <!-- <a class="btn btn-primary" href="{% url 'social:begin' 'twitter' %}" hidden="true">Login with Twitter<i class="fab fa-twitter"></i></a> -->
-        <a class="btn btn-primary" href="{% url 'social:begin' 'facebook' %}">Login with Facebook <i class="fab fa-facebook-square"></i></a>
-        <a class="btn btn-primary" href="{% url 'social:begin' 'google-oauth2' %}?next=/">Login with Google<i class="fab fa-google-plus-square"></i></a>
-    </div>
 </form>
+<div class="">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <!-- <a class="btn btn-primary" href="{% url 'social:begin' 'twitter' %}" hidden="true">Login with Twitter<i class="fab fa-twitter"></i></a> -->
+   <a class="btn btn-primary active" href="{% url 'social:begin' 'facebook' %}">Login with Facebook  <i class="fab fa-facebook-square"></i></a>
+   <a class="btn btn-primary active" href="{% url 'social:begin' 'google-oauth2' %}?next=/">Login with Google   <i class="fab fa-google-plus-square"></i></a>
+</div>
 {% endblock %}
 
 

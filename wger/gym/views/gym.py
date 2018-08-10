@@ -23,6 +23,7 @@ from django.contrib.auth.models import (
     Group,
     User
 )
+from django.contrib import messages
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import (
     HttpResponseForbidden,
@@ -272,6 +273,8 @@ def gym_permissions_user_edit(request, user_pk):
                 member.groups.add(Group.objects.get(
                     name='general_gym_manager'))
 
+            messages.success(request, _(
+                           'Successfully edited user roles.'))
             return HttpResponseRedirect(reverse('gym:gym:user-list',
                                                 kwargs={'pk': member.userprofile.gym.pk}))
     else:
