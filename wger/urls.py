@@ -177,8 +177,10 @@ urlpatterns = i18n_patterns(
     url(r'^sitemap\.xml$',
         sitemap,
         {'sitemaps': sitemaps},
-        name='sitemap')
+        name='sitemap'),
+    url(r'^fitbit/', include('fitapp.urls')),
 )
+
 
 #
 # URLs without language prefix
@@ -208,3 +210,5 @@ urlpatterns += [
 #
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

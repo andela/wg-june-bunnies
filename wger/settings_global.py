@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -92,6 +93,9 @@ INSTALLED_APPS = (
 
     # enable ssl
     "sslserver",
+
+    #fitbit app
+    'fitapp' 
 )
 
 # added list of external libraries to be installed by bower
