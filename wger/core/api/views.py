@@ -16,9 +16,13 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import User
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+from rest_framework.parsers import JSONParser
+from rest_framework.authtoken.models import Token
+from rest_framework import status
 
 from wger.core.models import (
     UserProfile,
@@ -33,10 +37,78 @@ from wger.core.api.serializers import (
     DaysOfWeekSerializer,
     LicenseSerializer,
     RepetitionUnitSerializer,
-    WeightUnitSerializer
+    WeightUnitSerializer,
+    UserprofileSerializer,
+    UserCreateSerializer
 )
-from wger.core.api.serializers import UserprofileSerializer
+
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+from wger.config.models import GymConfig
+from wger.gym.models import GymUserConfig
+
+
+class UserCreateViewSet(viewsets.ViewSet):
+    '''
+    API endpoint to create new users
+    '''
+    # protected endpoint
+    is_private = True
+
+    def create(self, request):
+        request_data = JSONParser().parse(request)
+
+        # get user profile
+        user_profile = UserProfile.objects.get(user=request.user)
+        
+        # check if user is allowed to create users via API
+
+        if user_profile.can_create_user:
+            password = request_data.get('password', None)
+            confirm_password = request_data.get('confirm_password', None)
+            email = request_data.get('email', None)
+            username = request_data.get('username', None)
+
+            # check passwords match don't match return 400
+            if password != confirm_password:
+                return Response({'message': 'Passwords provided do not match!'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # pass request data through serializer
+            user_serializer = UserCreateSerializer(data=request_data)
+            
+            # check if serializer is valid
+            if user_serializer.is_valid():
+                # get creator ID by introspecting token
+                creator = User.objects.get(pk=Token.objects.get(key=request.auth).user_id)
+                data = user_serializer.data
+                username, email, password = data.get('username'), data.get('email', None), data.get('password')
+
+                # create a user object
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.save()
+
+                # create user profile
+                user.userprofile.creator = creator.username
+                user.userprofile.token = request.auth.key
+                
+                # assign user a gym
+                gym_config = GymConfig.objects.get(pk=1)
+                if gym_config.default_gym:
+                    user.userprofile.gym = gym_config.default_gym
+
+                    # Create gym user configuration object
+                    config = GymUserConfig()
+                    config.gym = gym_config.default_gym
+                    config.user = user
+                    config.save()
+                
+                user.userprofile.save()
+                return Response({"message": "You have successfully created user: {}".format(username)}, status=status.HTTP_201_CREATED)
+            
+            # if serializer is invalid
+            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # if user is not allowed to create users via API
+        return Response({"message": "You are not authorised to create users via API"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
