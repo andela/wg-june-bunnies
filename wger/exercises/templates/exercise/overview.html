@@ -43,7 +43,7 @@ $(document).ready(function() {
 
     // Init the autocompleter
     $('#exercise-search').autocomplete({
-        serviceUrl: '{% url 'exercise-search' %}',
+        serviceUrl: "{% url 'exercise-search' %}",
         showNoSuggestionNotice: true,
         dataType: 'json',
         paramName: 'term',
@@ -52,6 +52,10 @@ $(document).ready(function() {
         onSelect: function (suggestion) {
             window.location.href = '/exercise/' + suggestion.data.id + '/view/'
         }
+    });
+    // show specific body parts on hovering
+    $('ul').find('a').hover(function() {
+        $(this).tab('show');
     });
 });
 </script>
@@ -67,8 +71,8 @@ $(document).ready(function() {
 {% regroup exercises by category as exercise_list %}
 <ul class="nav nav-tabs">
     {% for item in exercise_list %}
-    <li {% if forloop.first %}class="active"{% endif %}>
-        <a href="#tab-{{ item.grouper.id }}" id="category-{{ item.grouper.id }}" data-toggle="tab">{% trans item.grouper.name %}</a>
+    <li  class="{% if forloop.first %} active {% endif %}" >
+        <a href="#tab-{{ item.grouper.id }}" id="category-{{ item.grouper.id }}" data-toggle="tab" class="body-part-tab">{% trans item.grouper.name %}</a>
     </li>
     {% empty %}
         <li>{% trans "No categories." %} {% trans "Use link to create one" %}</li>
