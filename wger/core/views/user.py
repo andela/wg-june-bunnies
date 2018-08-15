@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 
 import logging
-
+import os
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.template.context_processors import csrf
@@ -262,6 +262,22 @@ def registration(request):
     template_data['extend_template'] = 'base.html'
 
     return render(request, 'form.html', template_data)
+
+@login_required
+def fitbit(request):
+    '''
+    method driving fitbit integration
+    '''
+    template_data = {}
+    fitbit_id = os.getenv('FITAPP_CONSUMER_KEY')
+    fitbit_secret_key = os.getenv('FITAPP_CONSUMER_SECRET')
+    callback_url = os.getenv('CALLBACKURL')
+    fitbit_scope = 'weight'
+    url_params = '&response_type=code&scope={}&redirect_uri={}'.format(fitbit_scope, callback_url)
+    fitbit_url = 'https://www.fitbit.com/oauth2/authorize?client_id={}'.format(fitbit_id)
+    get_fitbit = fitbit_url + url_params
+
+    return render(request, 'user/fitbit.html')
 
 
 @login_required
