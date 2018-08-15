@@ -47,7 +47,7 @@ from wger.config.models import GymConfig
 from wger.gym.models import GymUserConfig
 
 
-class UserCreateViewset(viewsets.ModelViewSet):
+class UserCreateViewSet(viewsets.ModelViewSet):
     '''
     API endpoint to create new users
     '''
