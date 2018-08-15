@@ -47,7 +47,7 @@ from wger.config.models import GymConfig
 from wger.gym.models import GymUserConfig
 
 
-class UserCreateViewSet(viewsets.ModelViewSet):
+class UserCreateViewSet(viewsets.ViewSet):
     '''
     API endpoint to create new users
     '''
@@ -64,16 +64,12 @@ class UserCreateViewSet(viewsets.ModelViewSet):
 
         if user_profile.can_create_user:
             password = request_data.get('password', None)
-            confirm_password = request_data.get('password', None)
+            confirm_password = request_data.get('confirm_password', None)
             email = request_data.get('email', None)
             username = request_data.get('username', None)
 
-            # ensure a username exists
-            if not username:
-                return Response({'message': 'A username is required!'}, status=status.HTTP_400_BAD_REQUEST)
-
             # check passwords match don't match return 400
-            if password and confirm_password and password != confirm_password:
+            if password != confirm_password:
                 return Response({'message': 'Passwords provided do not match!'}, status=status.HTTP_400_BAD_REQUEST)
             
             # pass request data through serializer
