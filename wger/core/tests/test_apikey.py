@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 
 import logging
+import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -72,3 +73,19 @@ class ApiKeyTestCase(WorkoutManagerTestCase):
 
         # New key is different from the one before
         self.assertNotEqual(key_before.key, key_after.key)
+
+    def test_api_user_creation(self):
+        '''
+        Tests the API key generation page
+        '''
+        registration_data = {
+            "username": "test11",
+            "email": "",
+            "password": "qwerty",
+            "confirm_password": "qwerty"
+        }
+        self.user_login('test')
+        user = User.objects.get(username='test')
+        # send with user not enabled to create users
+        response = self.client.post(reverse('core:user:api-key'), registration_data)
+        self.assertEqual(200 , response.status_code)
