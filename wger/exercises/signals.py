@@ -30,9 +30,6 @@ def reset_cache_muscle_on_delete(sender, instance, **kwargs):
     '''
     Resets the muscle cache on delete.
     '''
-    print("clear on muscle delete **************************")
-    print(sender)
-    print(instance.pk)
     cache.clear()
 
 
@@ -45,7 +42,6 @@ def delete_exercise_image_on_delete(sender, instance, **kwargs):
     thumbnailer = get_thumbnailer(instance.image)
     thumbnailer.delete_thumbnails()
     instance.image.delete(save=False)
-    cache.clear()
 
 
 @receiver(pre_save, sender=ExerciseImage)
