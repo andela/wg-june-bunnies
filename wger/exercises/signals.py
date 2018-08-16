@@ -14,15 +14,26 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 
-
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.core.cache import cache
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.signal_handlers import generate_aliases
 from easy_thumbnails.signals import saved_file
 
-from wger.exercises.models import ExerciseImage
+from wger.exercises.models import ExerciseImage, Muscle
+
+
+@receiver(post_delete, sender=Muscle)
+def reset_cache_muscle_on_delete(sender, instance, **kwargs):
+    '''
+    Resets the muscle cache on delete.
+    '''
+    print("clear on muscle delete **************************")
+    print(sender)
+    print(instance.pk)
+    cache.clear()
 
 
 @receiver(post_delete, sender=ExerciseImage)
@@ -34,13 +45,14 @@ def delete_exercise_image_on_delete(sender, instance, **kwargs):
     thumbnailer = get_thumbnailer(instance.image)
     thumbnailer.delete_thumbnails()
     instance.image.delete(save=False)
+    cache.clear()
 
 
 @receiver(pre_save, sender=ExerciseImage)
 def delete_exercise_image_on_update(sender, instance, **kwargs):
     '''
-    Delete the corresponding image from the filesystem when the an ExerciseImage
-    object was changed
+    Delete the corresponding image from the filesystem when the an
+    ExerciseImage object was changed
     '''
     if not instance.pk:
         return False

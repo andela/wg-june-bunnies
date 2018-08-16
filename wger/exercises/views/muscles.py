@@ -19,6 +19,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
+from django.core.cache import cache
 
 from django.views.generic import (
     ListView,
@@ -42,6 +43,7 @@ class MuscleListView(ListView):
     '''
     Overview of all muscles and their exercises
     '''
+    cache.clear()
     model = Muscle
     queryset = Muscle.objects.all().order_by('-is_front', 'name'),
     context_object_name = 'muscle_list'
@@ -65,6 +67,7 @@ class MuscleAdminListView(LoginRequiredMixin, PermissionRequiredMixin, MuscleLis
     permission_required = 'exercises.change_muscle'
     queryset = Muscle.objects.order_by('name')
     template_name = 'muscles/admin-overview.html'
+    cache.clear()
 
 
 class MuscleAddView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
