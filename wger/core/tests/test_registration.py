@@ -124,17 +124,3 @@ class RegistrationTestCase(WorkoutManagerTestCase):
             count_after = User.objects.count()
             self.assertEqual(response.status_code, 302)
             self.assertEqual(count_before, count_after)
-
-class CreateUserApiTestCase(api_base_test.ApiBaseResourceTestCase):
-    """Test creating new user via rest API."""
-
-    resource = User
-    data = {
-        "username": "test11",
-        "email": "",
-        "password": "qwerty",
-        "confirm_password": "qwerty"
-    }
-
-    def get_resource_name(self):
-        return 'usercreate'
