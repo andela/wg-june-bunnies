@@ -80,6 +80,7 @@ v1_api.register(core_api.UserProfileResource())
 v1_api.register(core_api.LicenseResource())
 
 
+
 ### /api/v2 - django rest framework
 router = routers.DefaultRouter()
 
@@ -100,6 +101,8 @@ router.register(r'workoutlog', manager_api_views.WorkoutLogViewSet,
                 base_name='workoutlog')
 
 # Core app
+router.register(r'createuser', core_api_views.UserCreateViewSet,
+                base_name='createuser')
 router.register(r'userprofile', core_api_views.UserProfileViewSet,
                 base_name='userprofile')
 router.register(r'language', core_api_views.LanguageViewSet,

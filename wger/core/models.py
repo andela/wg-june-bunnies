@@ -25,11 +25,13 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from wger.gym.models import Gym
 
+from rest_framework.authtoken.models import Token
+
+# local imports
+from wger.gym.models import Gym
 from wger.utils.constants import TWOPLACES
 from wger.utils.units import AbstractWeight
-
 from wger.weight.models import WeightEntry
 
 
@@ -117,6 +119,24 @@ class UserProfile(models.Model):
     The gym this user belongs to, if any
     '''
 
+    creator = models.CharField(editable=False,
+                               null=True,
+                               blank=True,
+                               max_length=100)
+    '''The creator shows the external app which crreated this user'''
+    
+    can_create_user = models.BooleanField(
+        default=False,
+        help_text='Allow user to create users via REST API')
+
+    ''' Shows if user is allowed to create users via REST API'''
+
+    token = models.CharField(editable=False,
+                             null=True,
+                             blank=True,
+                             max_length=50)
+    '''token for creating users via rest api'''
+    
     is_temporary = models.BooleanField(default=False,
                                        editable=False)
     '''
