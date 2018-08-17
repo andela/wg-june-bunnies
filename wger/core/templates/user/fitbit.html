@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n staticfiles wger_extras %}
+ {% block title %}{% trans "Fitbit access" %}{% endblock %}
+ {% block content %}
+<div class="card">
+{% blocktrans %}
+Allow wger to access and display your fitbit data.
+{% endblocktrans %}
+<br/><br/>
+<a href="{{ fit_link }}">
+    <button type="button" class="btn btn-primary">Authorise Fitbit</button>
+</a>
+</div>
+{% endblock %}
+ {% block sidebar %}
+{% endblock %}

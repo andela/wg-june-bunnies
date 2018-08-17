@@ -30,6 +30,11 @@ if os.environ.get("TRIGGER") == "True":
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
+# fitbit keyS
+FITAPP_CLIENT_ID = os.environ.get("CLIENT_ID")
+FITAPP_CONSUMER_KEY = os.environ.get("CLIENT_SECRET")
+FITAPP_CALLBACK_URL = os.environ.get("CALLBACK_URL")
+
 # Your reCaptcha keys
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''

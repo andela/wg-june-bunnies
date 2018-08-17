@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 
 import logging
-
+import logging
+import os
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.template.context_processors import csrf
@@ -38,6 +40,9 @@ from django.views.generic import (
 )
 from django.conf import settings
 from rest_framework.authtoken.models import Token
+from django.http import HttpRequest
+import requests
+import base64
 
 from wger.utils.constants import USER_TAB
 from wger.utils.generic_views import WgerFormMixin, WgerMultiplePermissionRequiredMixin
@@ -65,6 +70,7 @@ from wger.gym.models import (
 )
 
 logger = logging.getLogger(__name__)
+import datetime
 
 
 def login(request):
@@ -262,6 +268,81 @@ def registration(request):
     template_data['extend_template'] = 'base.html'
 
     return render(request, 'form.html', template_data)
+
+@login_required
+def fitbit(request):
+    '''
+    method driving fitbit integration
+    '''
+
+    template_data = {}
+    fitbit_id = os.getenv('CLIENT_ID')
+    fitbit_secret_key = os.getenv('SECRET_KEY')
+    callback_url = os.getenv('CALLBACK_URL')
+    fitbit_scope = 'weight'
+    url_params = '&response_type=code&scope={}&redirect_uri={}'.format(fitbit_scope, callback_url)
+    fitbit_url = 'https://www.fitbit.com/oauth2/authorize?client_id={}'.format(fitbit_id)
+    get_fitbit = fitbit_url + url_params
+
+    if 'code' in request.GET:
+        # get the code returned from the
+        code = request.GET.get('code', '')
+        client_secret = '{}:{}'.format(fitbit_id, fitbit_secret_key)
+         # Convert client secret key to bytes then to base64 for fitbit token
+        client_secret = client_secret.encode('utf-8')
+        b64_code = base64.b64encode(client_secret).decode('utf-8')
+         # custom headers for fitbit
+        headers = {
+            'Authorization': 'Basic {}'.format(b64_code),
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        # parameters for fitbit api request
+        params = {
+            'client_id': fitbit_id,
+            'client_secret': fitbit_secret_key,
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': callback_url
+        }
+        # retrieve fitbit access_token
+        post_fitbit = requests.post(
+            'https://api.fitbit.com/oauth2/token',
+            params,
+            headers=headers
+        ).json()
+
+        if 'access_token' in post_fitbit:
+            headers['Authorization'] = 'Bearer {}'.format(post_fitbit["access_token"])
+            user_id = post_fitbit['user_id']
+            period = '1w'
+            base_date = datetime.datetime.today().strftime('%Y-%m-%d')
+             # get request to retrieve weight data for the user
+            get_weight_params = '/body/log/weight/date/{}/{}.json'.format(base_date, period)
+            get_weight_url = 'https://api.fitbit.com/1/user/{}'.format(user_id)
+            get_weight = get_weight_url + get_weight_params
+            get_weight_data = requests.get(
+                get_weight,
+                headers=headers
+            ).json()
+            print('-----wqertyuioertyu',get_weight_data)
+           
+             # save fitbit data into the database
+            if 'weight' in get_weight_data:
+                try:
+                    for weight in get_weight_data['weight']:
+                        weight_entry = WeightEntry()
+                        weight_entry.user = request.user
+                        weight_entry.weight = weight['weight']
+                        weight_entry.date = weight['date']
+                        weight_entry.save()
+                        messages.success(request, _(
+                            'Successfully added weight data.'))
+                except IntegrityError as e:
+                    messages.success(request, _(
+                        'Weight data already added.'))
+
+    template_data.update({'fit_link':get_fitbit})
+    return render(request, 'user/fitbit.html', template_data)
 
 
 @login_required
