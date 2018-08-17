@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load staticfiles %}
+{% load i18n staticfiles cache wger_extras %}
 
 {% block title %}{% trans "Your nutrition plans" %}{% endblock %}
 
 
 {% block content %}
+{% cache 30 pan-overview language.id %}
 <div class="list-group">
     {% for plan in plans %}
         <a href="{{ plan.get_absolute_url }}" class="list-group-item">
@@ -16,7 +16,7 @@
                 {{ plan.creation_date }} –
                 {{ plan.get_nutritional_values.total.energy|floatformat }} {% trans "kcal" %}
             </p>
-        </a>
+        </a> 
     {% empty %}
         <a href="{% url 'nutrition:plan:add' %}" class="list-group-item">
         {% trans "No nutrition plans." %}<br>
@@ -24,6 +24,7 @@
         </a>
     {% endfor %}
 </div>
+{% endcache %}
 {% endblock %}
 
 
