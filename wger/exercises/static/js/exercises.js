@@ -24,31 +24,19 @@
  Highlight a muscle in the overview
  */
 function wgerHighlightMuscle(element) {
-  var $muscle;
-  var muscleId;
-  var isFront;
+  var $muscle
+  
   var divId;
   divId = $(element).data('target');
-  isFront = ($(element).data('isFront') === 'True') ? 'front' : 'back';
-  muscleId = divId.match(/\d+/);
-
+  
   // Reset all other highlighted muscles
   $muscle = $('.muscle');
-  $muscle.removeClass('muscle-active');
-  $muscle.addClass('muscle-inactive');
 
-  // Highlight the current one
   $(element).removeClass('muscle-inactive');
   $(element).addClass('muscle-active');
 
-  // Set the corresponding background
-  $('#muscle-system').css('background-image',
-    'url(/static/images/muscles/main/muscle-' + muscleId + '.svg),' +
-    'url(/static/images/muscles/muscular_system_' + isFront + '.svg)');
-
-  // Show the corresponding exercises
-  $('.exercise-list').hide();
-  $('#' + divId).show();
+   // Show the corresponding exercises
+   $('.exercise-list').hide();
 }
 
 /*
