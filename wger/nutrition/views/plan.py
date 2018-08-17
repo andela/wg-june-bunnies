@@ -81,7 +81,7 @@ def add(request):
     plan.user = request.user
     plan.language = load_language()
     plan.save()
-
+    cache.clear()
     return HttpResponseRedirect(reverse('nutrition:plan:view', kwargs={'id': plan.id}))
 
 
