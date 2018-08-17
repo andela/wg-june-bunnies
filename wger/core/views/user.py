@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 
 import logging
+import logging
 import os
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.template.context_processors import csrf
@@ -283,7 +285,7 @@ def fitbit(request):
     get_fitbit = fitbit_url + url_params
 
     if 'code' in request.GET:
-        # get the code returned from the url
+        # get the code returned from the
         code = request.GET.get('code', '')
         client_secret = '{}:{}'.format(fitbit_id, fitbit_secret_key)
          # Convert client secret key to bytes then to base64 for fitbit token
@@ -322,6 +324,8 @@ def fitbit(request):
                 get_weight,
                 headers=headers
             ).json()
+            print('-----wqertyuioertyu',get_weight_data)
+           
              # save fitbit data into the database
             if 'weight' in get_weight_data:
                 try:
