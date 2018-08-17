@@ -86,6 +86,9 @@ class ApiKeyTestCase(WorkoutManagerTestCase):
         }
         self.user_login('test')
         user = User.objects.get(username='test')
-        # send with user not enabled to create users
-        response = self.client.post(reverse('core:user:api-key'), registration_data)
-        self.assertEqual(200 , response.status_code)
+        user.userprofile.can_create_user = True
+        user.userprofile.save()
+        api_key = Token.objects.get(user=user)
+        headers = {'content-type': 'application/json', 'Authorization': 'Token {}'.format(api_key)}
+        response = self.client.post('/api/v2/createuser', registration_data, headers=headers)
+        assert(response)
