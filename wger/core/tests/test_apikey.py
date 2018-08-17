@@ -85,9 +85,11 @@ class ApiKeyTestCase(WorkoutManagerTestCase):
             "confirm_password": "qwerty"
         }
         self.user_login('test')
+
         user = User.objects.get(username='test')
-        user.userprofile.can_create_user = True
-        user.userprofile.save()
+        # user.userprofile.can_create_user = True
+        # user.userprofile.save()
+
         api_key = Token.objects.get(user=user)
         headers = {'content-type': 'application/json', 'Authorization': 'Token {}'.format(api_key)}
         response = self.client.post('/api/v2/createuser', registration_data, headers=headers)
