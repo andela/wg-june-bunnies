@@ -49,6 +49,7 @@ from wger.utils.generic_views import WgerFormMixin, WgerDeleteMixin
 from wger.utils.helpers import check_token, make_token
 from wger.utils.pdf import styleSheet
 from wger.utils.language import load_language
+from django.core.cache import cache
 
 
 logger = logging.getLogger(__name__)
@@ -99,6 +100,7 @@ class PlanDeleteView(WgerDeleteMixin, DeleteView):
         '''
         Send some additional data to the template
         '''
+        cache.clear()
         context = super(PlanDeleteView, self).get_context_data(**kwargs)
         context['title'] = _(u'Delete {0}?').format(self.object)
         return context
@@ -117,6 +119,7 @@ class PlanEditView(WgerFormMixin, UpdateView):
         '''
         Send some additional data to the template
         '''
+        cache.clear()
         context = super(PlanEditView, self).get_context_data(**kwargs)
         context['title'] = _(u'Edit {0}').format(self.object)
         return context
