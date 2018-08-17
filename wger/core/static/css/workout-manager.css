@@ -108,7 +108,7 @@ tr:hover .editoptions, tbody tr:hover td .editoptions, ul:hover .editoptions
 /*
  * Images inside a link are set to greyscale till mouseover
  */
-/*
+
 a img
 {
     filter: grayscale(100%);
@@ -126,7 +126,7 @@ a:hover img
     -ms-filter: grayscale(0%);
     -o-filter: grayscale(0%);	
 }
-*/
+
 
 /*
  * Set the sizes for the background where the muscles are shown on the exercise view page
@@ -291,4 +291,7 @@ div.info a, div.info a:hover, div.info a:active{
  **************************************************************/
 #shoutout h2:first-child {
     margin-top: 0;
+}
+.muscle:hover{
+    background: #eee !important;
 }
