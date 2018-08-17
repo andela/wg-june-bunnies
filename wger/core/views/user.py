@@ -283,6 +283,7 @@ def fitbit(request):
     get_fitbit = fitbit_url + url_params
 
     if 'code' in request.GET:
+        # get the code returned from the url
         code = request.GET.get('code', '')
         client_secret = '{}:{}'.format(fitbit_id, fitbit_secret_key)
          # Convert client secret key to bytes then to base64 for fitbit token
@@ -307,20 +308,6 @@ def fitbit(request):
             params,
             headers=headers
         ).json()
-        if 'access_token' in post_fitbit:
-            headers['Authorization'] = 'Bearer {}'.format(post_fitbit["access_token"])
-            user_id = post_fitbit['user_id']
-            period = '1w'
-            base_date = datetime.datetime.today().strftime('%Y-%m-%d')
-             # get request to retrieve weight data for the user
-            get_weight_params = '/body/log/weight/date/{}/{}.json'.format(base_date, period)
-            get_weight_url = 'https://api.fitbit.com/1/user/{}'.format(user_id)
-            get_weight = get_weight_url + get_weight_params
-            get_weight_data = requests.get(
-                get_weight,
-                headers=headers
-            ).json()
-
 
         if 'access_token' in post_fitbit:
             headers['Authorization'] = 'Bearer {}'.format(post_fitbit["access_token"])
