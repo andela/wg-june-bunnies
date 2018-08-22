@@ -2,20 +2,20 @@ import re
 from django.forms.extras.widgets import SelectDateWidget
 from django.forms.widgets import Widget, Select, MultiWidget
 from django.utils.safestring import mark_safe
- __all__ = ('SelectTimeWidget')
+__all__ = ('SelectTimeWidget')
  # Attempt to match many time formats:
 # Example: "12:34:56 P.M."  matches:
 # ('12', '34', ':56', '56', 'P.M.', 'P', '.', 'M', '.')
 # ('12', '34', ':56', '56', 'P.M.')
 # Note that the colon ":" before seconds is optional, but only if seconds are omitted
 time_pattern = r'(\d\d?):(\d\d)(:(\d\d))? *([aApP]\.?[mM]\.?)?$'
- RE_TIME = re.compile(time_pattern)
+RE_TIME = re.compile(time_pattern)
 # The following are just more readable ways to access re.matched groups:
 HOURS = 0
 MINUTES = 1
 SECONDS = 3
 MERIDIEM = 4
- class SelectTimeWidget(Widget):
+class SelectTimeWidget(Widget):
     """
     A Widget that splits time input into <select> elements.
     Allows form to show as 24hr: <hour>:<minute>:<second>, (default)
@@ -27,17 +27,17 @@ MERIDIEM = 4
     second_field = '%s_second'
     meridiem_field = '%s_meridiem'
     twelve_hr = False  # Default to 24hr.
-     def __init__(self, attrs=None, hour_step=None, minute_step=None, second_step=None, twelve_hr=False):
+    def __init__(self, attrs=None, hour_step=None, minute_step=None, second_step=None, twelve_hr=False):
         """
         hour_step, minute_step, second_step are optional step values for
         for the range of values for the associated select element
         twelve_hr: If True, forces the output to be in 12-hr format (rather than 24-hr)
         """
         self.attrs = attrs or {}
-         if twelve_hr:
+        if twelve_hr:
             self.twelve_hr = True  # Do 12hr (rather than 24hr)
             self.meridiem_val = 'a.m.'  # Default to Morning (A.M.)
-         if hour_step and twelve_hr:
+        if hour_step and twelve_hr:
             self.hours = range(1, 13, hour_step)
         elif hour_step:  # 24hr, with stepping.
             self.hours = range(0, 24, hour_step)
@@ -45,15 +45,15 @@ MERIDIEM = 4
             self.hours = range(1, 13)
         else:  # 24hr, no stepping
             self.hours = range(0, 24)
-         if minute_step:
+        if minute_step:
             self.minutes = range(0, 60, minute_step)
         else:
             self.minutes = range(0, 60)
-         if second_step:
+        if second_step:
             self.seconds = range(0, 60, second_step)
         else:
             self.seconds = range(0, 60)
-     def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None):
         try:  # try to get time values from a datetime.time object (value)
             hour_val, minute_val, second_val = value.hour, value.minute, value.second
             if self.twelve_hr:
@@ -91,7 +91,7 @@ MERIDIEM = 4
                 hour_val = hour_val % 12
         elif hour_val == 0:
             hour_val = 12
-         output = []
+        output = []
         if 'id' in self.attrs:
             id_ = self.attrs['id']
         else:
@@ -101,39 +101,39 @@ MERIDIEM = 4
         hour_val = u"%.2d" % hour_val
         minute_val = u"%.2d" % minute_val
         second_val = u"%.2d" % second_val
-         hour_choices = [("%.2d" % i, "%.2d" % i) for i in self.hours]
+        hour_choices = [("%.2d" % i, "%.2d" % i) for i in self.hours]
         local_attrs = self.build_attrs(id=self.hour_field % id_)
         select_html = Select(choices=hour_choices).render(self.hour_field % name, hour_val, local_attrs)
         output.append(select_html)
-         minute_choices = [("%.2d" % i, "%.2d" % i) for i in self.minutes]
+        minute_choices = [("%.2d" % i, "%.2d" % i) for i in self.minutes]
         local_attrs['id'] = self.minute_field % id_
         select_html = Select(choices=minute_choices).render(self.minute_field % name, minute_val, local_attrs)
         output.append(select_html)
-         if self.twelve_hr:
+        if self.twelve_hr:
             #  If we were given an initial value, make sure the correct meridiem gets selected.
             if self.meridiem_val is not None and self.meridiem_val.startswith('p'):
                 meridiem_choices = [('p.m.', 'p.m.'), ('a.m.', 'a.m.')]
             else:
                 meridiem_choices = [('a.m.', 'a.m.'), ('p.m.', 'p.m.')]
-             local_attrs['id'] = local_attrs['id'] = self.meridiem_field % id_
+            local_attrs['id'] = local_attrs['id'] = self.meridiem_field % id_
             select_html = Select(choices=meridiem_choices).render(self.meridiem_field % name, self.meridiem_val,
                                                                   local_attrs)
             output.append(select_html)
-         return mark_safe(u'\n'.join(output))
-     def id_for_label(self, id_):
+        return mark_safe(u'\n'.join(output))
+    def id_for_label(self, id_):
         return '%s_hour' % id_
-     id_for_label = classmethod(id_for_label)
-     def value_from_datadict(self, data, files, name):
+    id_for_label = classmethod(id_for_label)
+    def value_from_datadict(self, data, files, name):
         # if there's not h:m:s data, assume zero:
         h = data.get(self.hour_field % name, 0)  # hour
         m = data.get(self.minute_field % name, 0)  # minute
-         meridiem = data.get(self.meridiem_field % name, None)
+        meridiem = data.get(self.meridiem_field % name, None)
          # NOTE: if meridiem is None, assume 24-hr
         if meridiem is not None:
             if meridiem.lower().startswith('p') and int(h) != 12:
                 h = (int(h) + 12) % 24
             elif meridiem.lower().startswith('a') and int(h) == 12:
                 h = 0
-         if (int(h) == 0 or h) and m:
+        if (int(h) == 0 or h) and m:
             return '%s:%s' % (h, m)
-         return data.get(name, None)
+        return data.get(name, None)
