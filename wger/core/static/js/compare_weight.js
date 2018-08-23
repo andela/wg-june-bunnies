@@ -23,16 +23,19 @@
     checkboxes = $('input[type=checkbox].checkbox:checked');
     if (checkboxes.size() === 2) {
       $('#compare').show();
-      $('#compare_weight_diagrams').show();
     } else {
       $('#compare').hide();
       $('#compare_weight_diagrams').hide();
+      $('#compare_weight_diagrams').html('');
+      $('#graph_error').html('');
+      
     }
   });
    $('#compare').click(function () {
     var users = [];
     var graph_data=[];
-    var user_data;
+    var test_data= [];
+    var user_data={"user":'',"data":''};
     var error;
     var ctx = $('#compare_weight_diagrams')
     // loop through selected users 
@@ -48,10 +51,9 @@
         url: url,
         success: function(data) {
           if (data.length > 0) {
-            user_data = data
-            graph_data.push(user_data);
+            graph_data.push({'user':username, 'data': data});
           }else{
-            error = username+" has no weight data to comapre";
+            error = '<b>'+username+'</b>'+" has no weight data to comapre";
           }  
         }
       });
@@ -60,23 +62,36 @@
         $('#compare_weight_diagrams').hide();
         $('#graph_error').html('<div class="alert alert-info">'+error+'</div>') 
       }else{
-        // graph
+        console.log(graph_data[0].data)
+        $('#compare_weight_diagrams').show();
+        var labels=[];
+        if(graph_data[0].data.length > graph_data[1].data.length){
+          for (var l=0; l<graph_data[0].data.length; l++){labels.push(graph_data[0].data[l].x)}
+        }else{
+          for (var l=0; l<graph_data[1].data.length; l++){labels.push(graph_data[1].data[l].x)}
+        }
         var myChart = new Chart(ctx, {
           type: 'line',
           data: {
+            labels: labels,
             datasets: [{
-                label: "user 1",
-                data: graph_data[0],
+                label: graph_data[0].user,
+                data: graph_data[0].data,
                 borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    'rgba(255,99,132,1)'
                 ],
                 borderWidth: 2
-            }]
+            },
+            {
+              label: graph_data[1].user,
+              data: graph_data[1].data,
+              type: 'line',
+              borderColor: [
+                'rgba(0,0,255,1)'
+            ],
+            borderWidth: 2
+            }
+          ]
           },
           options: {
               scales: {
