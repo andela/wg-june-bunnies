@@ -3,6 +3,9 @@
 <link rel="stylesheet" type="text/css" href="{% static 'bower_components/datatables/media/css/dataTables.bootstrap.min.css' %}">
 <script src="{% static 'bower_components/datatables/media/js/jquery.dataTables.min.js' %}" ></script>
 <script src="{% static 'bower_components/datatables/media/js/dataTables.bootstrap.min.js' %}" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="{% static 'js/compare_weight.js' %}"></script>
+
 <script>
 $(document).ready( function () {
     /* Make table sortable */
@@ -39,12 +42,14 @@ $(document).ready( function () {
     <a href="javascript:void(0)" onclick="openTab(event, 'Inactive');">
       <div class="w3-third tablink w3-hover-light-grey w3-padding"><h4>Inactive Members List</h4></div>
     </a>
+    <a id="compare" class="btn btn-success">Compare</a>
   </div>
 
   <div id="Active" class="w3-container tab">
     <table class="table table-hover" id="active_member_list">
         <thead>
         <tr>
+            <th></th>
             {% for key in user_table.keys %}
                 <th>{{ key }}</th>
             {% endfor %}
@@ -65,6 +70,7 @@ $(document).ready( function () {
     <table class="table table-hover" id="inactive_member_list">
         <thead>
             <tr>
+                <th></th>
                 {% for key in user_table.keys %}
                     <th>{{ key }}</th>
                 {% endfor %}
@@ -81,3 +87,6 @@ $(document).ready( function () {
   </div>        
 
 </div>
+<div id='graph_error'>
+</div>
+<canvas id="compare_weight_diagrams"></canvas>
