@@ -528,4 +528,5 @@ class WorkoutLogApiTestCase(api_base_test.ApiBaseResourceTestCase):
             "repetition_unit": 1,
             "weight_unit": 2,
             "weight": 2,
+            "workout_session_id": 1,
             "date": datetime.date.today()}
