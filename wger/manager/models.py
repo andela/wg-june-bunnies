@@ -347,7 +347,7 @@ class ScheduleStep(models.Model):
     duration = models.IntegerField(verbose_name=_('Duration'),
                                    help_text=_('The duration in weeks'),
                                    default=4,
-                                   validators=[MinValueValidator(1), MaxValueValidator(25)])
+                                   validators=[MinValueValidator(1), MaxValueValidator(52)])
     '''The duration in weeks'''
 
     order = models.IntegerField(verbose_name=_('Order'),
