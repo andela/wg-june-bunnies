@@ -18,6 +18,7 @@ import logging
 import csv
 import datetime
 
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -45,6 +46,25 @@ from wger.utils.generic_views import WgerFormMixin
 
 logger = logging.getLogger(__name__)
 
+@api_view(['GET'])
+def compare_weight_data(request, username=None):
+    '''
+    Process the data to pass it to the JS libraries to generate an SVG image
+    '''
+    user = User.objects.get(username=username)
+    date_min = request.GET.get('date_min', False)
+    date_max = request.GET.get('date_max', True)
+    if date_min and date_max:
+        weights = WeightEntry.objects.filter(user=user,
+                                             date__range=(date_min, date_max))
+    else:
+        weights = WeightEntry.objects.filter(user=user)
+    chart_data = []
+    for i in weights:
+        chart_data.append({'x': i.date,
+                           'y': i.weight})
+     # Return the results to the client
+    return Response(chart_data)
 
 class WeightAddView(WgerFormMixin, CreateView):
     '''
