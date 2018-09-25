@@ -112,7 +112,8 @@ class Workout(models.Model):
         of a workout structure is needed. As an additional benefit, the template
         caches are not needed anymore.
         '''
-        workout_canonical_form = cache.get(cache_mapper.get_workout_canonical(self.pk))
+        workout_canonical_form = cache.get(
+            cache_mapper.get_workout_canonical(self.pk))
         if not workout_canonical_form:
             day_canonical_repr = []
             muscles_front = []
@@ -150,7 +151,8 @@ class Workout(models.Model):
                                                   'backsecondary': muscles_back_secondary},
                                       'day_list': day_canonical_repr}
             # Save to cache
-            cache.set(cache_mapper.get_workout_canonical(self.pk), workout_canonical_form)
+            cache.set(cache_mapper.get_workout_canonical(
+                self.pk), workout_canonical_form)
 
         return workout_canonical_form
 
@@ -187,7 +189,8 @@ class ScheduleManager(models.Manager):
 
             schedule = False
             try:
-                active_workout = Workout.objects.filter(user=user).latest('creation_date')
+                active_workout = Workout.objects.filter(
+                    user=user).latest('creation_date')
 
             # no luck, there aren't even workouts for the user
             except ObjectDoesNotExist:
@@ -207,6 +210,15 @@ class Schedule(models.Model):
 
     objects = ScheduleManager()
     '''Custom manager'''
+
+
+    CYCLE_OPTIONS = [
+        ('null', 'No period'),
+        ('Microcycle', 'Microcycle i.e 1 week'),
+        ('Mesocycle', 'Mesocycle i.e 2-6 weeks'),
+        ('Macrocycle', 'Macrocycle i.e 1 year')
+    ]
+    '''Options to choose from for periodization'''
 
     user = models.ForeignKey(User,
                              verbose_name=_('User'),
@@ -240,6 +252,14 @@ class Schedule(models.Model):
                                   help_text=_("Tick the box if you want to repeat the schedules "
                                               "in a loop (i.e. A, B, C, A, B, C, and so on)"))
     '''A flag indicating whether the schedule should act as a loop'''
+
+    period = models.CharField(verbose_name=_('Period'),
+                              max_length=50,
+                              default=CYCLE_OPTIONS[0][0],
+                              choices=CYCLE_OPTIONS,
+                              null=True)
+
+    '''Indicates the period for which the schedule is to take place'''
 
     def __str__(self):
         '''
@@ -277,7 +297,8 @@ class Schedule(models.Model):
             return False
         while not found:
             for step in steps:
-                current_limit = start_date + datetime.timedelta(weeks=step.duration)
+                current_limit = start_date + \
+                    datetime.timedelta(weeks=step.duration)
                 if current_limit >= datetime.date.today():
                     found = True
                     return step
@@ -326,7 +347,7 @@ class ScheduleStep(models.Model):
     duration = models.IntegerField(verbose_name=_('Duration'),
                                    help_text=_('The duration in weeks'),
                                    default=4,
-                                   validators=[MinValueValidator(1), MaxValueValidator(25)])
+                                   validators=[MinValueValidator(1), MaxValueValidator(52)])
     '''The duration in weeks'''
 
     order = models.IntegerField(verbose_name=_('Order'),
@@ -507,7 +528,8 @@ class Day(models.Model):
                         exercise['setting_obj_list'].pop(-1)
                         setting_text, setting_list, weight_list,\
                             reps_list, repetition_units, weight_units = \
-                            reps_smart_text(exercise['setting_obj_list'], set_obj)
+                            reps_smart_text(
+                                exercise['setting_obj_list'], set_obj)
                         exercise['setting_text'] = setting_text
                         exercise['repetition_units'] = repetition_units
 
@@ -530,7 +552,7 @@ class Day(models.Model):
         return {'obj': self,
                 'days_of_week': {
                     'text': u', '.join([six.text_type(_(i.day_of_week))
-                                       for i in tmp_days_of_week]),
+                                        for i in tmp_days_of_week]),
                     'day_list': tmp_days_of_week},
                 'muscles': {
                     'back': muscles_back,
@@ -676,101 +698,6 @@ class Setting(models.Model):
         return self.set.exerciseday.training
 
 
-@python_2_unicode_compatible
-class WorkoutLog(models.Model):
-    '''
-    A log entry for an exercise
-    '''
-
-    user = models.ForeignKey(User,
-                             verbose_name=_('User'),
-                             editable=False)
-    exercise = models.ForeignKey(Exercise,
-                                 verbose_name=_('Exercise'))
-    workout = models.ForeignKey(Workout,
-                                verbose_name=_('Workout'))
-
-    repetition_unit = models.ForeignKey(RepetitionUnit,
-                                        verbose_name=_('Unit'),
-                                        default=1)
-    '''
-    The unit of the log. This can be e.g. a repetition, a minute, etc.
-    '''
-
-    reps = models.IntegerField(verbose_name=_('Repetitions'),
-                               validators=[MinValueValidator(0)])
-    '''
-    Amount of repetitions, minutes, etc.
-
-    Note that since adding the unit field, the name is no longer correct, but is
-    kept for compatibility reasons (specially for the REST API).
-    '''
-
-    weight = models.DecimalField(decimal_places=2,
-                                 max_digits=5,
-                                 verbose_name=_('Weight'),
-                                 validators=[MinValueValidator(0)])
-
-    weight_unit = models.ForeignKey(WeightUnit,
-                                    verbose_name=_('Unit'),
-                                    default=1)
-    '''
-    The weight unit of the log. This can be e.g. kg, lb, km/h, etc.
-    '''
-
-    date = Html5DateField(verbose_name=_('Date'))
-
-    # Metaclass to set some other properties
-    class Meta:
-        ordering = ["date", "reps"]
-
-    def __str__(self):
-        '''
-        Return a more human-readable representation
-        '''
-        return u"Log entry: {0} - {1} kg on {2}".format(self.reps,
-                                                        self.weight,
-                                                        self.date)
-
-    def get_owner_object(self):
-        '''
-        Returns the object that has owner information
-        '''
-        return self
-
-    def get_workout_session(self, date=None):
-        '''
-        Returns the corresponding workout session
-
-        :return the WorkoutSession object or None if nothing was found
-        '''
-        if not date:
-            date = self.date
-
-        try:
-            return WorkoutSession.objects.filter(user=self.user).get(date=date)
-        except WorkoutSession.DoesNotExist:
-            return None
-
-    def save(self, *args, **kwargs):
-        '''
-        Reset cache
-        '''
-        reset_workout_log(self.user_id, self.date.year, self.date.month, self.date.day)
-
-        # If the user selected "Until Failure", do only 1 "repetition",
-        # everythin else doesn't make sense.
-        if self.repetition_unit == 2:
-            self.reps = 1
-        super(WorkoutLog, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        '''
-        Reset cache
-        '''
-        reset_workout_log(self.user_id, self.date.year, self.date.month, self.date.day)
-        super(WorkoutLog, self).delete(*args, **kwargs)
-
 
 @python_2_unicode_compatible
 class WorkoutSession(models.Model):
@@ -860,10 +787,12 @@ class WorkoutSession(models.Model):
         '''
 
         if (not self.time_end and self.time_start) or (self.time_end and not self.time_start):
-            raise ValidationError(_("If you enter a time, you must enter both start and end time."))
+            raise ValidationError(
+                _("If you enter a time, you must enter both start and end time."))
 
         if self.time_end and self.time_start and self.time_start > self.time_end:
-            raise ValidationError(_("The start time cannot be after the end time."))
+            raise ValidationError(
+                _("The start time cannot be after the end time."))
 
     def get_owner_object(self):
         '''
@@ -884,3 +813,112 @@ class WorkoutSession(models.Model):
         '''
         reset_workout_log(self.user_id, self.date.year, self.date.month)
         super(WorkoutSession, self).delete(*args, **kwargs)
+
+@python_2_unicode_compatible
+class WorkoutLog(models.Model):
+    '''
+    A log entry for an exercise
+    '''
+
+    user = models.ForeignKey(User,
+                             verbose_name=_('User'),
+                             editable=False)
+    exercise = models.ForeignKey(Exercise,
+                                 verbose_name=_('Exercise'))
+    workout = models.ForeignKey(Workout,
+                                verbose_name=_('Workout'))
+
+    repetition_unit = models.ForeignKey(RepetitionUnit,
+                                        verbose_name=_('Unit'),
+                                        default=1)
+    '''
+    The unit of the log. This can be e.g. a repetition, a minute, etc.
+    '''
+
+    reps = models.IntegerField(verbose_name=_('Repetitions'),
+                               validators=[MinValueValidator(0)])
+    '''
+    Amount of repetitions, minutes, etc.
+
+    Note that since adding the unit field, the name is no longer correct, but is
+    kept for compatibility reasons (specially for the REST API).
+    '''
+
+    weight = models.DecimalField(decimal_places=2,
+                                 max_digits=5,
+                                 verbose_name=_('Weight'),
+                                 validators=[MinValueValidator(0)])
+
+    weight_unit = models.ForeignKey(WeightUnit,
+                                    verbose_name=_('Unit'),
+                                    default=1)
+    '''
+    The weight unit of the log. This can be e.g. kg, lb, km/h, etc.
+    '''
+
+    date = Html5DateField(verbose_name=_('Date'))
+
+    '''
+    Adding a Workout session id as a foreign key from the WorkoutSession class
+    '''
+    workout_session_id = models.ForeignKey(WorkoutSession,
+                                        verbose_name=_('workout_session_id'),
+                                        null=True)
+
+    # Metaclass to set some other properties
+    class Meta:
+        ordering = ["date", "reps"]
+
+    def __str__(self):
+        '''
+        Return a more human-readable representation
+        '''
+        return u"Log entry: {0} - {1} kg on {2}".format(self.reps,
+                                                        self.weight,
+                                                        self.date)
+
+    def get_owner_object(self):
+        '''
+        Returns the object that has owner information
+        '''
+        return self
+
+    def get_workout_session(self, date=None):
+        '''
+        Returns the corresponding workout session
+
+        :return the WorkoutSession object or None if nothing was found
+        '''
+        if not date:
+            date = self.date
+
+        try:
+            if not self.workout_session_id:
+                return WorkoutSession.objects.filter(user=self.user).get(date=date)
+            workout_session_id = self.workout_session_id
+            return WorkoutSession.objects.filter(user=self.user).get(date=date,
+                id=workout_session_id)
+        except WorkoutSession.DoesNotExist:
+            return None
+
+    def save(self, *args, **kwargs):
+        '''
+        Reset cache
+        '''
+        reset_workout_log(self.user_id, self.date.year,
+                          self.date.month, self.date.day)
+
+        # If the user selected "Until Failure", do only 1 "repetition",
+        # everythin else doesn't make sense.
+        if self.repetition_unit == 2:
+            self.reps = 1
+        super(WorkoutLog, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        '''
+        Reset cache
+        '''
+        reset_workout_log(self.user_id, self.date.year,
+                          self.date.month, self.date.day)
+        super(WorkoutLog, self).delete(*args, **kwargs)
+

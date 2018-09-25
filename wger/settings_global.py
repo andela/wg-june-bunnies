@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -86,13 +87,22 @@ INSTALLED_APPS = (
 
     # django-bower for installing bower packages
     'djangobower',
+
+    # social django auth for oauth
+    'social_django',
+
+    # enable ssl
+    "sslserver",
+
+    #fitbit app
+    'fitapp' 
 )
 
 # added list of external libraries to be installed by bower
 BOWER_INSTALLED_APPS = (
     'jquery#2.1.x',
     'bootstrap',
-    'd3',
+    'd3#4.4.0',
     'shariff',
     'tinymce-dist',
     'DataTables',
@@ -109,6 +119,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
     # Javascript Header. Sends helper headers for AJAX
     'wger.utils.middleware.JavascriptAJAXRedirectionMiddleware',
@@ -126,11 +137,22 @@ MIDDLEWARE_CLASSES = (
     # Django mobile
     'django_mobile.middleware.MobileDetectionMiddleware',
     'django_mobile.middleware.SetFlavourMiddleware',
+    # django social auth
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+
+    # Whitenoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # django social auth
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'wger.utils.helpers.EmailAuthBackend'
+    'wger.utils.helpers.EmailAuthBackend',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GooglePlusAuth',
 )
 
 TEMPLATES = [
@@ -154,7 +176,11 @@ TEMPLATES = [
                 'django_mobile.context_processors.flavour',
 
                 # Breadcrumbs
-                'django.template.context_processors.request'
+                'django.template.context_processors.request',
+
+                # social auth
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect'
             ],
             'loaders': [
                 # Django mobile
@@ -310,7 +336,7 @@ THUMBNAIL_ALIASES = {
 #
 # Django compressor
 #
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # The default is not DEBUG, override if needed
@@ -333,7 +359,8 @@ else:
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('wger.utils.permissions.WgerPermission',),
     'PAGINATE_BY': 20,
-    'PAGINATE_BY_PARAM': 'limit',  # Allow client to override, using `?limit=xxx`.
+    # Allow client to override, using `?limit=xxx`.
+    'PAGINATE_BY_PARAM': 'limit',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -370,3 +397,8 @@ WGER_SETTINGS = {
     'EMAIL_FROM': 'wger Workout Manager <wger@example.com>',
     'TWITTER': False
 }
+
+SOCIAL_AUTH_FACEBOOK_KEY = os.getenv('FB_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv('FB_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_SECRET')

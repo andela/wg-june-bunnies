@@ -18,7 +18,7 @@ import logging
 import uuid
 import datetime
 
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
@@ -69,8 +69,10 @@ class WorkoutLogUpdateView(WgerFormMixin, UpdateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(WorkoutLogUpdateView, self).get_context_data(**kwargs)
-        context['form_action'] = reverse('manager:log:edit', kwargs={'pk': self.object.id})
-        context['title'] = _(u'Edit log entry for %s') % self.object.exercise.name
+        context['form_action'] = reverse(
+            'manager:log:edit', kwargs={'pk': self.object.id})
+        context['title'] = _(
+            u'Edit log entry for %s') % self.object.exercise.name
 
         return context
 
@@ -135,7 +137,7 @@ def add(request, pk):
     # Define the formset here because now we know the value to pass to 'extra'
     WorkoutLogFormSet = modelformset_factory(WorkoutLog,
                                              form=WorkoutLogForm,
-                                             exclude=('date', 'workout'),
+                                             exclude=('date', 'workout', 'workout_session_id'),
                                              extra=total_sets)
     # Process the request
     if request.method == 'POST':
@@ -147,7 +149,8 @@ def add(request, pk):
 
         for form_id in form_to_exercise:
             if post_copy.get('form-%s-weight' % form_id) or post_copy.get('form-%s-reps' % form_id):
-                post_copy['form-%s-exercise' % form_id] = form_to_exercise[form_id].id
+                post_copy['form-%s-exercise' %
+                          form_id] = form_to_exercise[form_id].id
 
         # Pass the new data to the forms
         formset = WorkoutLogFormSet(data=post_copy)
@@ -159,8 +162,10 @@ def add(request, pk):
             log_date = dateform.cleaned_data['date']
 
             if WorkoutSession.objects.filter(user=request.user, date=log_date).exists():
-                session = WorkoutSession.objects.get(user=request.user, date=log_date)
-                session_form = HelperWorkoutSessionForm(data=post_copy, instance=session)
+                session = WorkoutSession.objects.get(
+                    user=request.user, date=log_date)
+                session_form = HelperWorkoutSessionForm(
+                    data=post_copy, instance=session)
 
             # Save the Workout Session only if there is not already one for this date
             instance = session_form.save(commit=False)
@@ -169,11 +174,13 @@ def add(request, pk):
                 instance.user = request.user
                 instance.workout = day.training
             else:
-                session = WorkoutSession.objects.get(user=request.user, date=log_date)
+                session = WorkoutSession.objects.get(
+                    user=request.user, date=log_date)
                 instance.instance = session
             instance.save()
 
             # Log entries (only the ones with actual content)
+            workout_session_id = instance
             instances = [i for i in formset.save(commit=False) if i.reps]
             for instance in instances:
                 if not instance.weight:
@@ -181,6 +188,7 @@ def add(request, pk):
                 instance.user = request.user
                 instance.workout = day.training
                 instance.date = log_date
+                instance.workout_session_id = workout_session_id
                 instance.save()
 
             return HttpResponseRedirect(reverse('manager:log:log', kwargs={'pk': day.training_id}))
@@ -197,7 +205,8 @@ def add(request, pk):
         # Depending on whether there is already a workout session for today, update
         # the current one or create a new one (this will be the most usual case)
         if WorkoutSession.objects.filter(user=request.user, date=datetime.date.today()).exists():
-            session = WorkoutSession.objects.get(user=request.user, date=datetime.date.today())
+            session = WorkoutSession.objects.get(
+                user=request.user, date=datetime.date.today())
             session_form = HelperWorkoutSessionForm(instance=session)
         else:
             session_form = HelperWorkoutSessionForm()
@@ -215,7 +224,8 @@ def add(request, pk):
     template_data['formset'] = formset
     template_data['dateform'] = dateform
     template_data['session_form'] = session_form
-    template_data['form_action'] = reverse('manager:day:log', kwargs={'pk': pk})
+    template_data['form_action'] = reverse(
+        'manager:day:log', kwargs={'pk': pk})
 
     return render(request, 'day/log.html', template_data)
 
@@ -257,7 +267,8 @@ class WorkoutLogDetailView(DetailView, LoginRequiredMixin):
                     #       also has the disadvantage that if new ones are added in a
                     #       local instance, they could "slip" through.
                     logs = exercise_list['obj'].workoutlog_set.filter(user=self.owner_user,
-                                                                      weight_unit__in=(1, 2),
+                                                                      weight_unit__in=(
+                                                                          1, 2),
                                                                       workout=self.object) \
                         .exclude(repetition_unit_id__in=(2, 3, 4, 5, 6, 7, 8))
                     entry_log, chart_data = process_log_entries(logs)
@@ -267,7 +278,8 @@ class WorkoutLogDetailView(DetailView, LoginRequiredMixin):
                     if exercise_log:
                         workout_log[day_id][exercise_id] = {}
                         workout_log[day_id][exercise_id]['log_by_date'] = entry_log
-                        workout_log[day_id][exercise_id]['div_uuid'] = 'div-' + str(uuid.uuid4())
+                        workout_log[day_id][exercise_id]['div_uuid'] = 'div-' + \
+                            str(uuid.uuid4())
                         workout_log[day_id][exercise_id]['chart_data'] = chart_data
 
         context['workout_log'] = workout_log
@@ -305,7 +317,8 @@ def calendar(request, username=None, year=None, month=None):
     (current_workout, schedule) = Schedule.objects.get_current_workout(user)
     grouped_log_entries = group_log_entries(user, year, month)
 
-    context['calendar'] = WorkoutCalendar(grouped_log_entries).formatmonth(year, month)
+    context['calendar'] = WorkoutCalendar(
+        grouped_log_entries).formatmonth(year, month)
     context['logs'] = grouped_log_entries
     context['current_year'] = year
     context['current_month'] = month
@@ -313,7 +326,8 @@ def calendar(request, username=None, year=None, month=None):
     context['owner_user'] = user
     context['is_owner'] = is_owner
     context['impressions'] = WorkoutSession.IMPRESSION
-    context['month_list'] = WorkoutLog.objects.filter(user=user).dates('date', 'month')
+    context['month_list'] = WorkoutLog.objects.filter(
+        user=user).dates('date', 'month')
     context['show_shariff'] = is_owner and user.userprofile.ro_access
     return render(request, 'calendar/month.html', context)
 

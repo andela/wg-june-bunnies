@@ -8,9 +8,34 @@
 <!--
         Title
 -->
-{% block title %}{% trans "Exercises" %}{% endblock %}
+{% block title %}{% trans "Exercises" %}
 
-
+<div class="btn-group" style="float: right;">
+    <button type="button" class="btn btn-success dropdown-toggle btn-sm" data-toggle="dropdown">
+        {% trans 'Filter by language' %}
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li>
+            <a href={% url 'exercise:exercise:overview' %}>None
+        </li>
+        {% for language_code, language in languages %}
+        <li>
+            <a href={% url 'exercise:exercise:overview' %}?lang={{language_code}}>{{language}}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="btn-group">
+    <button type="button" class="btn btn-primary btn-sm" disabled>
+        {% if lang %}
+        {{lang.full_name}}
+        {% else %}
+        All Languages
+        {% endif %}
+    </button>
+</div>
+{% endblock %}
 
 {% block header %}
 <script>
@@ -28,6 +53,14 @@ $(document).ready(function() {
             window.location.href = '/exercise/' + suggestion.data.id + '/view/'
         }
     });
+    (function ($) {
+        $(function () {
+          $(document).off('click.bs.tab.data-api', '[data-hover="tab"]');
+          $(document).on('mouseenter.bs.tab.data-api', '[data-toggle="tab"], [data-hover="tab"]', function () {
+            $(this).tab('show');
+          });
+        });
+      })(jQuery);
 });
 </script>
 {% endblock %}

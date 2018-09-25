@@ -18,6 +18,7 @@ import logging
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.db import models
 from django.forms import ModelForm, ModelChoiceField
@@ -59,13 +60,46 @@ class StepCreateView(WgerFormMixin, CreateView, PermissionRequiredMixin):
         '''
 
         class StepForm(ModelForm):
-            workout = ModelChoiceField(queryset=Workout.objects.filter(user=self.request.user))
+            workout = ModelChoiceField(
+                queryset=Workout.objects.filter(user=self.request.user))
+            
+            def __init__(self, schedule_id, *args, **kwargs):
+                super(StepForm, self).__init__(*args, **kwargs)
+                # set the schedule_id as an attribute of the form
+                self.schedule_id = schedule_id
+            
+            def clean_duration(self):
+                """Ensures duration does not exceed period"""
+                duration = self.cleaned_data['duration']
+                schedule = Schedule.objects.get(pk=self.schedule_id)
+                sum_duration = schedule.schedulestep_set.all().aggregate(models.Sum('duration'))
+                # Catch NoneType error for 1st workout to be added to schedule.
+                sum_duration = sum_duration['duration__sum'] or 0
+                derived_duration = duration + sum_duration
+    
+                # Check if duration exceeds cycle duration
+                if schedule.period == 'Macrocycle' and derived_duration > 52:
+                    msg = 'Duration Cycle exceeds 1 year. \'{}\' weeks are left in the cycle'.format(52 - sum_duration)
+                    raise ValidationError(_(msg))
+                elif schedule.period == 'Mesocycle' and derived_duration > 6:
+                    msg = 'Duration cycle excedds 6 weeks. \'{}\' weeks are left in the cycle'.format(6-sum_duration)
+                    raise ValidationError(_(msg))
+                elif schedule.period == 'Microcycle' and derived_duration > 1:
+                    raise ValidationError(_(
+                        'Workout already exists. Delete existing workout to add new one'))
+                return duration
 
             class Meta:
                 model = ScheduleStep
                 exclude = ('order', 'schedule')
 
+
         return StepForm
+    
+    def get_form_kwargs(self):
+        kwargs = super(CreateView, self).get_form_kwargs()
+        kwargs['schedule_id'] = self.kwargs['schedule_pk']
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super(StepCreateView, self).get_context_data(**kwargs)
@@ -105,7 +139,8 @@ class StepEditView(WgerFormMixin, UpdateView, PermissionRequiredMixin):
         '''
 
         class StepForm(ModelForm):
-            workout = ModelChoiceField(queryset=Workout.objects.filter(user=self.request.user))
+            workout = ModelChoiceField(
+                queryset=Workout.objects.filter(user=self.request.user))
 
             class Meta:
                 model = ScheduleStep
@@ -136,5 +171,6 @@ class StepDeleteView(WgerDeleteMixin, DeleteView, PermissionRequiredMixin):
         '''
         context = super(StepDeleteView, self).get_context_data(**kwargs)
         context['title'] = _(u'Delete {0}?').format(self.object)
-        context['form_action'] = reverse('core:license:delete', kwargs={'pk': self.kwargs['pk']})
+        context['form_action'] = reverse('core:license:delete', kwargs={
+                                         'pk': self.kwargs['pk']})
         return context

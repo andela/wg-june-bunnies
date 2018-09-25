@@ -49,6 +49,7 @@ from wger.utils.generic_views import WgerFormMixin, WgerDeleteMixin
 from wger.utils.helpers import check_token, make_token
 from wger.utils.pdf import styleSheet
 from wger.utils.language import load_language
+from django.core.cache import cache
 
 
 logger = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ def add(request):
     plan.user = request.user
     plan.language = load_language()
     plan.save()
-
+    cache.clear()
     return HttpResponseRedirect(reverse('nutrition:plan:view', kwargs={'id': plan.id}))
 
 
@@ -99,6 +100,7 @@ class PlanDeleteView(WgerDeleteMixin, DeleteView):
         '''
         Send some additional data to the template
         '''
+        cache.clear()
         context = super(PlanDeleteView, self).get_context_data(**kwargs)
         context['title'] = _(u'Delete {0}?').format(self.object)
         return context
@@ -117,6 +119,7 @@ class PlanEditView(WgerFormMixin, UpdateView):
         '''
         Send some additional data to the template
         '''
+        cache.clear()
         context = super(PlanEditView, self).get_context_data(**kwargs)
         context['title'] = _(u'Edit {0}').format(self.object)
         return context
@@ -266,7 +269,8 @@ def export_pdf(request, id, uidb64=None, token=None):
         for item in meal.mealitem_set.select_related():
             ingredient_markers.append(len(data))
 
-            p = Paragraph(u'<para>{0}</para>'.format(item.ingredient.name), styleSheet["Normal"])
+            p = Paragraph(
+                u'<para>{0}</para>'.format(item.ingredient.name), styleSheet["Normal"])
             if item.get_unit_type() == MEALITEM_WEIGHT_GRAM:
                 unit_name = 'g'
             else:
@@ -281,8 +285,10 @@ def export_pdf(request, id, uidb64=None, token=None):
     # Set specific styles, e.g. background for title cells
     for marker in meal_markers:
         # Set background colour for headings
-        table_style.append(('BACKGROUND', (0, marker), (-1, marker), header_colour))
-        table_style.append(('BOX', (0, marker), (-1, marker), 1.25, colors.black))
+        table_style.append(
+            ('BACKGROUND', (0, marker), (-1, marker), header_colour))
+        table_style.append(
+            ('BOX', (0, marker), (-1, marker), 1.25, colors.black))
 
         # Make the headings span the whole width
         table_style.append(('SPAN', (0, marker), (-1, marker)))
@@ -316,7 +322,7 @@ def export_pdf(request, id, uidb64=None, token=None):
     # Create table with nutritional calculations
     data = []
     data.append([Paragraph(u'<para align="center">{0}</para>'.format(_('Nutritional data')),
-                 styleSheet["Bold"])])
+                           styleSheet["Bold"])])
     data.append([Paragraph(_('Macronutrients'), styleSheet["Normal"]),
                  Paragraph(_('Total'), styleSheet["Normal"]),
                  Paragraph(_('Percent of energy'), styleSheet["Normal"]),
@@ -324,8 +330,10 @@ def export_pdf(request, id, uidb64=None, token=None):
     data.append([Paragraph(_('Energy'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['energy']), styleSheet["Normal"])])
     data.append([Paragraph(_('Protein'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['protein']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['protein']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(
+                     plan_data['total']['protein']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(
+                     plan_data['percent']['protein']), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['per_kg']['protein']), styleSheet["Normal"])])
     data.append([Paragraph(_('Carbohydrates'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['carbohydrates']),
@@ -338,8 +346,10 @@ def export_pdf(request, id, uidb64=None, token=None):
                  Paragraph(six.text_type(plan_data['total']['carbohydrates_sugar']),
                            styleSheet["Normal"])])
     data.append([Paragraph(_('Fat'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['fat']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['fat']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(
+                     plan_data['total']['fat']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(
+                     plan_data['percent']['fat']), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['per_kg']['fat']), styleSheet["Normal"])])
     data.append([Paragraph(_('Saturated fat content in fats'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['fat_saturated']),

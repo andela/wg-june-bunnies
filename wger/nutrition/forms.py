@@ -26,6 +26,7 @@ from wger.nutrition.models import (
     MealItem
 )
 from wger.utils.widgets import Html5NumberInput
+from wger.utils.timewidget import SelectTimeWidget
 
 
 logger = logging.getLogger(__name__)
@@ -125,7 +126,17 @@ class MealItemForm(forms.ModelForm):
                                          required=False)
     ingredient = forms.ModelChoiceField(queryset=Ingredient.objects.all(),
                                         widget=forms.HiddenInput)
+    time = forms.TimeField(required=False, label=_('Time (approx)'),
+                            widget=SelectTimeWidget(twelve_hr=True)) 
 
+    STATUSCHOICE = (
+        ('Eaten', 'Eaten'),
+        ('Planned', 'Planned')
+    )
+    status_choice = forms.ChoiceField(
+        label='Meal Status', widget=forms.Select, choices=STATUSCHOICE)
+                                       
+                            
     class Meta:
         model = MealItem
         fields = '__all__'
@@ -145,4 +156,5 @@ class MealItemForm(forms.ModelForm):
         # Filter the available ingredients
         if ingredient_id:
             self.fields['weight_unit'].queryset = \
-                IngredientWeightUnit.objects.filter(ingredient_id=ingredient_id)
+                IngredientWeightUnit.objects.filter(
+                    ingredient_id=ingredient_id)

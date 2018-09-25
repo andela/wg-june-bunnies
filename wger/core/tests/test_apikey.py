@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 
 import logging
+import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -39,7 +40,8 @@ class ApiKeyTestCase(WorkoutManagerTestCase):
         # User already has a key
         response = self.client.get(reverse('core:user:api-key'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Delete current API key and generate new one')
+        self.assertContains(
+            response, 'Delete current API key and generate new one')
         self.assertTrue(Token.objects.get(user=user))
 
         # User has no keys
@@ -58,14 +60,37 @@ class ApiKeyTestCase(WorkoutManagerTestCase):
         user = User.objects.get(username='test')
         key_before = Token.objects.get(user=user)
 
-        response = self.client.get(reverse('core:user:api-key'), {'new_key': True})
+        response = self.client.get(
+            reverse('core:user:api-key'), {'new_key': True})
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response['Location'])
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Delete current API key and generate new one')
+        self.assertContains(
+            response, 'Delete current API key and generate new one')
 
         key_after = Token.objects.get(user=user)
         self.assertTrue(key_after)
 
         # New key is different from the one before
         self.assertNotEqual(key_before.key, key_after.key)
+
+    def test_api_user_creation(self):
+        '''
+        Tests the API key generation page
+        '''
+        registration_data = {
+            "username": "test11",
+            "email": "",
+            "password": "qwerty",
+            "confirm_password": "qwerty"
+        }
+        self.user_login('test')
+
+        user = User.objects.get(username='test')
+        # user.userprofile.can_create_user = True
+        # user.userprofile.save()
+
+        api_key = Token.objects.get(user=user)
+        headers = {'content-type': 'application/json', 'Authorization': 'Token {}'.format(api_key)}
+        response = self.client.post('/api/v2/createuser', registration_data, headers=headers)
+        assert(response)

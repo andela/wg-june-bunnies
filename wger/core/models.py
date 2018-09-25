@@ -25,11 +25,13 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from wger.gym.models import Gym
 
+from rest_framework.authtoken.models import Token
+
+# local imports
+from wger.gym.models import Gym
 from wger.utils.constants import TWOPLACES
 from wger.utils.units import AbstractWeight
-
 from wger.weight.models import WeightEntry
 
 
@@ -117,6 +119,24 @@ class UserProfile(models.Model):
     The gym this user belongs to, if any
     '''
 
+    creator = models.CharField(editable=False,
+                               null=True,
+                               blank=True,
+                               max_length=100)
+    '''The creator shows the external app which crreated this user'''
+    
+    can_create_user = models.BooleanField(
+        default=False,
+        help_text='Allow user to create users via REST API')
+
+    ''' Shows if user is allowed to create users via REST API'''
+
+    token = models.CharField(editable=False,
+                             null=True,
+                             blank=True,
+                             max_length=50)
+    '''token for creating users via rest api'''
+    
     is_temporary = models.BooleanField(default=False,
                                        editable=False)
     '''
@@ -174,7 +194,8 @@ by the US Department of Agriculture. It is extremely complete, with around
     '''
 
     notification_language = models.ForeignKey(Language,
-                                              verbose_name=_('Notification language'),
+                                              verbose_name=_(
+                                                  'Notification language'),
                                               help_text=_('Language to use when sending you email '
                                                           'notifications, e.g. email reminders for '
                                                           'workouts. This does not affect the '
@@ -209,7 +230,8 @@ by the US Department of Agriculture. It is extremely complete, with around
 
     height = IntegerField(verbose_name=_('Height (cm)'),
                           blank=False,
-                          validators=[MinValueValidator(140), MaxValueValidator(230)],
+                          validators=[MinValueValidator(
+                              140), MaxValueValidator(230)],
                           null=True)
     '''The user's height'''
 
@@ -221,7 +243,8 @@ by the US Department of Agriculture. It is extremely complete, with around
     '''Gender'''
 
     sleep_hours = IntegerField(verbose_name=_('Hours of sleep'),
-                               help_text=_('The average hours of sleep per day'),
+                               help_text=_(
+                                   'The average hours of sleep per day'),
                                default=7,
                                blank=False,
                                null=True,
@@ -280,7 +303,8 @@ by the US Department of Agriculture. It is extremely complete, with around
     '''Physical intensity during free time'''
 
     calories = IntegerField(verbose_name=_('Total daily calories'),
-                            help_text=_('Total caloric intake, including e.g. any surplus'),
+                            help_text=_(
+                                'Total caloric intake, including e.g. any surplus'),
                             default=2500,
                             blank=False,
                             null=True,
@@ -348,8 +372,8 @@ by the US Department of Agriculture. It is extremely complete, with around
         Make sure the total amount of hours is 24
         '''
         if ((self.sleep_hours and self.freetime_hours and self.work_hours)
-           and (self.sleep_hours + self.freetime_hours + self.work_hours) > 24):
-                raise ValidationError(_('The sum of all hours has to be 24'))
+                and (self.sleep_hours + self.freetime_hours + self.work_hours) > 24):
+            raise ValidationError(_('The sum of all hours has to be 24'))
 
     def __str__(self):
         '''
@@ -379,7 +403,8 @@ by the US Department of Agriculture. It is extremely complete, with around
         if not self.weight or not self.height:
             return 0
 
-        weight = self.weight if self.use_metric else AbstractWeight(self.weight, 'lb').kg
+        weight = self.weight if self.use_metric else AbstractWeight(
+            self.weight, 'lb').kg
         return weight / (self.height / decimal.Decimal(100) *
                          self.height / decimal.Decimal(100.0))
 
@@ -390,7 +415,8 @@ by the US Department of Agriculture. It is extremely complete, with around
         Currently only the Mifflin-St.Jeor formula is supported
         '''
         factor = 5 if self.gender == self.GENDER_MALE else -161
-        weight = self.weight if self.use_metric else AbstractWeight(self.weight, 'lb').kg
+        weight = self.weight if self.use_metric else AbstractWeight(
+            self.weight, 'lb').kg
 
         try:
             rate = ((10 * weight)  # in kg
@@ -541,7 +567,8 @@ class License(models.Model):
     '''Short name, e.g. CC-BY-SA 3'''
 
     url = models.URLField(verbose_name=_('Link'),
-                          help_text=_('Link to license text or other information'),
+                          help_text=_(
+                              'Link to license text or other information'),
                           blank=True,
                           null=True)
     '''URL to full license text or other information'''
